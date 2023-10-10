@@ -13,7 +13,7 @@ const Home = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/SEC_User")
+    fetch("http://localhost:8000/user")
       .then((res) => {
         return res.json();
       })
@@ -68,7 +68,7 @@ const Home = () => {
               <ion-icon name="person-outline" className="ion"></ion-icon>
             </span>
           </td>
-          <td>{user.user_Name}</td>
+          <td>{user.user_name}</td>
         </tr>
       </>
     );
@@ -124,18 +124,18 @@ const Home = () => {
                   ) : (
                     <>
                       <td>
-                        {JSON.parse(sessionStorage.getItem("user")).user_Name}
+                        {JSON.parse(sessionStorage.getItem("user")).user_name}
                       </td>
                       <td>
                         {
                           JSON.parse(sessionStorage.getItem("user"))
-                            .user_EmailAddress
+                            .user_emailaddress
                         }
                       </td>
                       <td>
                         {
                           JSON.parse(sessionStorage.getItem("user"))
-                            .user_MobileNumber
+                            .user_mobilenumber
                         }
                       </td>
                     </>

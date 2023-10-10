@@ -14,7 +14,7 @@ const SelectAllTopic = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/MST_ProgramTopic")
+    fetch("http://localhost:8000/programs")
       .then((res) => {
         return res.json();
       })
@@ -24,16 +24,28 @@ const SelectAllTopic = () => {
       .catch((e) => {});
   }, []);
 
-  const allTopics = topicObj.map((topic) => {
+  let setForTopic = new Set();
+
+  topicObj.forEach((element)=>{
+    setForTopic.add(element.program_topic);
+  });
+
+  let topicsArray = [];
+
+  setForTopic.forEach((element)=>{
+    topicsArray.push(element);
+  })
+
+  const allTopics = topicsArray.map((topic) => {
     return (
       <>
         <tr>
           <td>
             <Link
-              to={"./SelectByTopicName/"+ topic.topic_Name}
+              to={"./SelectByTopicName/"+ topic}
               style={{ textDecoration: "none" }}
             >
-              {topic.topic_Name}
+              {topic}
             </Link>
           </td>
         </tr>

@@ -13,7 +13,7 @@ const Login = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/SEC_User")
+    fetch("http://localhost:8000/user")
       .then((res) => {
         return res.json();
       })
@@ -74,7 +74,7 @@ const Login = () => {
                 onClickCapture={(e) => {
                   e.preventDefault();
                   users.map((user) => {
-                    if (user.user_Name === login.name && user.user_Password === login.pass) {
+                    if (user.user_name === login.name && user.user_password === login.pass) {
                       sessionStorage.setItem("user", JSON.stringify(user));
                       navigate("../");
                     }

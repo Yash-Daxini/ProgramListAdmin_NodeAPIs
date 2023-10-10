@@ -16,7 +16,7 @@ const SelectByTopicName = () => {
   }, [navigate])
 
   useEffect(() => {
-    fetch(`https://localhost:5001/api/MST_Program/programsByTopicName/${params.name}`)
+    fetch(`http://localhost:8000/programs/topics/${params.name}`)
       .then((res) => {
         return res.json();
       })
@@ -35,21 +35,21 @@ const SelectByTopicName = () => {
               to={"../../../SelectAll/SelectByID/" + program.id}
               style={{ textDecoration: "none" }}
             >
-              {program.program_Name}
+              {program.program_name}
             </Link>
           </td>
-          <td>{program.program_Topic}</td>
+          <td>{program.program_topic}</td>
           <td>
-            <Link to={program.program_Link} target="_blank">
+            <Link to={program.program_link} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>
           <td>
-            <Link to={program.program_SolutionLink} target="_blank">
+            <Link to={program.program_solutionlink} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>
-          <td>{program.program_Difficulty}</td>
+          <td>{program.difficulty}</td>
         </tr>
       </>
     );

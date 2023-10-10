@@ -15,7 +15,7 @@ const SelectByID = () => {
   }, [navigate])
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/MST_Program/" + params.id)
+    fetch("http://localhost:8000/programs/" + params.id)
       .then((res) => {
         return res.json();
       })
@@ -27,7 +27,7 @@ const SelectByID = () => {
 
   return (
     <div className="align-items-center my-5">
-      <h1 className="my-5">{programObj.program_Name}</h1>
+      <h1 className="my-5">{programObj.program_name}</h1>
       {/* <h5>
         {programObj.issolved ? (
           <span className="text-success">
@@ -41,24 +41,24 @@ const SelectByID = () => {
       <div className="my-5 d-flex justify-content-center align-items-center flex-column">
         <h4 style={{textTransform:"capitalize"}}>Topic : {programObj.program_Topic} </h4>
         <hr/>
-        {programObj.program_Difficulty === "Easy" ? (
+        {programObj.difficulty === "Easy" ? (
             <h4 className="customBadgeSuccess">
-              <span className="fs-6">{programObj.program_Difficulty}</span>
+              <span className="fs-6">{programObj.difficulty}</span>
             </h4>
-          ) : programObj.program_Difficulty === "Medium" ? (
+          ) : programObj.difficulty === "Medium" ? (
             <h4 className="customBadgeWarning">
-              <span className="fs-6">{programObj.program_Difficulty}</span>
+              <span className="fs-6">{programObj.difficulty}</span>
             </h4>
           ) : (
             <h4 className="customBadgeDanger">
-              <span className="fs-6">{programObj.program_Difficulty}</span>
+              <span className="fs-6">{programObj.difficulty}</span>
             </h4>
           )}
       </div>
       <div className="my-5 d-flex justify-content-center align-items-center">
         <button className="btn btn-outline-primary mx-5">
           <Link
-            to={programObj.program_Link}
+            to={programObj.program_link}
             className="text-decoration-none text-dark"
           >
             Solve Here{" "}
@@ -66,7 +66,7 @@ const SelectByID = () => {
         </button>
         <button className="btn btn-outline-primary mx-5">
           <Link
-            to={programObj.program_SolutionLink}
+            to={programObj.program_solutionlink}
             className="text-decoration-none text-dark"
           >
             See Solution{" "}

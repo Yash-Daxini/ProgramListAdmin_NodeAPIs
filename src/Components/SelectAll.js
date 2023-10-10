@@ -5,10 +5,10 @@ import Swal from "sweetalert2";
 const SelectAll = () => {
   const navigate = useNavigate();
   const [programObj, setProgramObj] = useState([]);
-  const [topicObj, setTopicObj] = useState([]);
+  // const [topicObj, setTopicObj] = useState([]);
   const [filterObj, setFilterObj] = useState({
-    program_Topic: "all",
-    program_Difficulty: "all",
+    program_topic: "all",
+    difficulty: "all",
   });
 
   useEffect(() => {
@@ -17,19 +17,19 @@ const SelectAll = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    fetch(`https://localhost:5001/api/MST_ProgramTopic/`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setTopicObj(data);
-      })
-      .catch((e) => {});
-  }, []);
+  // useEffect(() => {
+  //   fetch(`http://localhost:8000/programs`)
+  //     .then((res) => {
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       setTopicObj(data);
+  //     })
+  //     .catch((e) => {});
+  // }, []);
 
   useEffect(() => {
-    fetch(`https://localhost:5001/api/MST_Program/`)
+    fetch(`http://localhost:8000/programs`)
       .then((res) => {
         return res.json();
       })
@@ -39,24 +39,20 @@ const SelectAll = () => {
       .catch((e) => {});
   }, []);
 
-  const fetchUsingFilter = (program_Topic, program_Difficulty) => {
-    // console.warn(program_Topic + " " + program_Difficulty);
-    fetch(
-      `https://localhost:5001/api/MST_Program/getByFilter/${program_Topic}/${program_Difficulty}`
-    )
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setProgramObj(data);
-        filterObj.program_Topic = program_Topic;
-        filterObj.program_Difficulty = program_Difficulty;
-      })
-      .catch((e) => {});
-  };
+  let setForTopic = new Set();
+
+  let topicObj = [];
+
+  programObj.forEach((element) => {
+    setForTopic.add(element.program_topic);
+  });
+
+  setForTopic.forEach((element)=>{
+    topicObj.push(element);
+  });
 
   const Delete = (id) => {
-    fetch(`https://localhost:5001/api/MST_Program/${id}`, {
+    fetch(`http://localhost:8000/programs/${id}`, {
       method: "DELETE",
     })
       .then((resp) => {
@@ -89,28 +85,28 @@ const SelectAll = () => {
         <tr>
           <td>
             <Link
-              to={"./SelectByID/" + program.id}
+              to={"./SelectByID/" + program._id}
               style={{ textDecoration: "none" }}
             >
-              {program.program_Name}
+              {program.program_name}
             </Link>
           </td>
-          <td>{program.program_Topic}</td>
+          <td>{program.program_topic}</td>
           <td>
-            <Link to={program.program_Link} target="_blank">
+            <Link to={program.program_link} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>
           <td>
-            <Link to={program.program_SolutionLink} target="_blank">
+            <Link to={program.program_solutionlink} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>
-          <td>{program.program_Difficulty}</td>
+          <td>{program.difficulty}</td>
           <td>
             <button className="btn btn-outline-info">
               <Link
-                to={"./UpdateByID/" + program.id}
+                to={"./UpdateByID/" + program._id}
                 className="text-decoration-none"
               >
                 <ion-icon name="create-outline"></ion-icon>
@@ -132,7 +128,7 @@ const SelectAll = () => {
                   confirmButtonText: "Yes, delete it!",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    Delete(program.id);
+                    Delete(program._id);
                   }
                 });
               }}
@@ -145,10 +141,10 @@ const SelectAll = () => {
     );
   });
 
-  const allTopicsName = topicObj.map((topicObj) => {
+  const allTopicsName = topicObj.map((topic) => {
     return (
       <>
-        <option>{topicObj.topic_Name}</option>
+        <option>{topic}</option>
       </>
     );
   });
@@ -162,10 +158,10 @@ const SelectAll = () => {
         <div className="d-flex justify-content-center aligm-items-center flex-wrap w-50">
           <select
             className="form-control m-2"
-            value={filterObj.program_Topic}
+            value={filterObj.program_topic}
             onChange={(e) => {
-              setFilterObj({ ...filterObj, program_Topic: e.target.value });
-              fetchUsingFilter(e.target.value, filterObj.program_Difficulty);
+              setFilterObj({ ...filterObj, program_topic: e.target.value });
+              // fetchUsingFilter(e.target.value, filterObj.difficulty);
             }}
           >
             <option value={"all"}>Select Topic Name</option>
@@ -173,13 +169,13 @@ const SelectAll = () => {
           </select>
           <select
             className="form-control m-2"
-            value={filterObj.program_Difficulty}
+            value={filterObj.difficulty}
             onChange={(e) => {
               setFilterObj({
                 ...filterObj,
-                program_Difficulty: e.target.value,
+                difficulty: e.target.value,
               });
-              fetchUsingFilter(filterObj.program_Topic, e.target.value);
+              // fetchUsingFilter(filterObj.program_topic, e.target.value);
             }}
           >
             <option value={"all"}>Select Difficulty</option>

@@ -5,29 +5,18 @@ import Swal from "sweetalert2";
 const SelectAll = () => {
   const navigate = useNavigate();
   const [programObj, setProgramObj] = useState([]);
-  // const [topicObj, setTopicObj] = useState([]);
   const [filterObj, setFilterObj] = useState({
     program_topic: "all",
     difficulty: "all",
   });
+  const [filterArr,setFilterArr] = useState([]);
 
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
       navigate("../login");
     }
   }, [navigate]);
-
-  // useEffect(() => {
-  //   fetch(`http://localhost:8000/programs`)
-  //     .then((res) => {
-  //       return res.json();
-  //     })
-  //     .then((data) => {
-  //       setTopicObj(data);
-  //     })
-  //     .catch((e) => {});
-  // }, []);
-
+  
   useEffect(() => {
     fetch(`http://localhost:8000/programs`)
       .then((res) => {
@@ -35,6 +24,7 @@ const SelectAll = () => {
       })
       .then((data) => {
         setProgramObj(data);
+        setFilterArr(data);
       })
       .catch((e) => {});
   }, []);
@@ -79,7 +69,7 @@ const SelectAll = () => {
       });
   };
 
-  const allPrograms = programObj.map((program) => {
+  const allPrograms = filterArr.map((program) => {
     return (
       <>
         <tr>
@@ -161,7 +151,20 @@ const SelectAll = () => {
             value={filterObj.program_topic}
             onChange={(e) => {
               setFilterObj({ ...filterObj, program_topic: e.target.value });
-              // fetchUsingFilter(e.target.value, filterObj.difficulty);
+              if(e.target.value === "all" && filterObj.difficulty === "all"){
+                setFilterArr(programObj);
+              }
+              else if(e.target.value === "all"){
+                setFilterArr(programObj.filter((ele)=>ele.difficulty === filterObj.difficulty));
+              }
+              else if(filterObj.difficulty === "all"){
+                let arr = programObj.filter((ele)=>ele.program_topic === e.target.value);
+                setFilterArr(arr);
+              }
+              else{
+                setFilterArr(programObj.filter((ele)=>ele.program_topic === e.target.value && ele.difficulty === filterObj.difficulty));
+              }
+              
             }}
           >
             <option value={"all"}>Select Topic Name</option>
@@ -175,7 +178,18 @@ const SelectAll = () => {
                 ...filterObj,
                 difficulty: e.target.value,
               });
-              // fetchUsingFilter(filterObj.program_topic, e.target.value);
+              if(e.target.value === "all" && filterObj.program_topic === "all"){
+                setFilterArr(programObj);
+              }
+              else if(e.target.value === "all"){
+                setFilterArr(programObj.filter((ele)=>ele.program_topic === filterObj.program_topic));
+              }
+              else if(filterObj.program_topic === "all"){
+                setFilterArr(programObj.filter((ele)=>ele.difficulty === e.target.value));
+              }
+              else{
+                setFilterArr(programObj.filter((ele)=>ele.program_topic === filterObj.program_topic && ele.difficulty === e.target.value));
+              }
             }}
           >
             <option value={"all"}>Select Difficulty</option>

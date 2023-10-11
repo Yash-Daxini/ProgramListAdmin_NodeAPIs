@@ -44,20 +44,32 @@ const Home = () => {
     }, duration);
   });
 
-  const [topicAndCount, setTopicAndCount] = useState([]);
+  const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/MST_Program/problemcount")
+    fetch("http://localhost:8000/programs")
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setTopicAndCount(data);
+        setPrograms(data);
       })
       .catch((e) => {});
   }, []);
 
-  let totalProgram = 0;
+  let setForTopics = new Set();
+
+  programs.forEach(element => {
+    setForTopics.add(element.program_topic);
+  });
+
+  let topicsArr = [];
+
+  setForTopics.forEach(element => {
+    topicsArr.push(element);
+  });
+
+  let totalProgram = programs.length;
 
   const dispayAdminUser = users.map((user) => {
     return (
@@ -74,16 +86,17 @@ const Home = () => {
     );
   });
 
-  const cardsOfCount = topicAndCount.map((obj) => {
-    totalProgram += obj.program_Count;
+  const cardsOfCount = topicsArr.map((obj) => {
+    let arr = programs.filter((program)=>program.program_topic === obj);
+    let programCount = arr.length;
     return (
       <div class="card">
         <div>
-          <div class="cardNumber" data-val={obj.program_Count}>
-            {obj.program_Count}
+          <div class="cardNumber" data-val={programCount}>
+            {programCount}
           </div>
         </div>
-        <div class="cardName">{obj.topic_Name}</div>
+        <div class="cardName">{obj}</div>
       </div>
     );
   });
@@ -141,63 +154,6 @@ const Home = () => {
                     </>
                   )}
                 </tr>
-                {/* <tr>
-                <td>Allan Smith</td>
-                <td>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td>Amit Shroff</td>
-                <td>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star-half" class="star"></ion-icon>
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td>Darshan Uni.</td>
-                <td>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                  <span>
-                    <ion-icon name="star" class="star"></ion-icon>
-                  </span>
-                </td>
-              </tr> */}
               </tbody>
             </table>
           </div>
@@ -217,30 +173,6 @@ const Home = () => {
             </thead>
             <tbody>
               {dispayAdminUser}
-              {/* <tr>
-                <td>
-                  <span>
-                    <ion-icon class="text-warning" name="person"></ion-icon>
-                  </span>
-                </td>
-                <td>Allan Smith</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <ion-icon class="text-prinmary" name="person"></ion-icon>
-                  </span>
-                </td>
-                <td>Amit Shroff</td>
-              </tr>
-              <tr>
-                <td>
-                  <span>
-                    <ion-icon class="text-danger" name="person"></ion-icon>
-                  </span>
-                </td>
-                <td>Darshan Uni.</td>
-              </tr> */}
             </tbody>
           </table>
         </div>

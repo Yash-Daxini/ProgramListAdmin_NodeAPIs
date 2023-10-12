@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  // const [totalProgram,setTotalProgram] = useState(0);
 
   useEffect(() => {
     if (sessionStorage.getItem("user") == null) {
@@ -57,6 +58,8 @@ const Home = () => {
       .catch((e) => {});
   }, []);
 
+  // setTotalProgram(programs.length);
+
   let setForTopics = new Set();
 
   programs.forEach(element => {
@@ -69,7 +72,6 @@ const Home = () => {
     topicsArr.push(element);
   });
 
-  let totalProgram = programs.length;
 
   const dispayAdminUser = users.map((user) => {
     return (
@@ -107,8 +109,8 @@ const Home = () => {
         {cardsOfCount}
         <div class="card">
           {/* <div> */}
-          <div class="cardNumber" data-val={totalProgram}>
-            {totalProgram}
+          <div class="cardNumber" data-val={programs.length}>
+            {programs.length}
           </div>
           <div class="cardName">Total Questions</div>
           {/* </div> */}

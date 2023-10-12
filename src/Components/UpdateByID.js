@@ -1,31 +1,54 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const UpdateByID = () => {
   const [newProgram, setNewProgram] = useState({});
-
+  const [topicObj, setTopicObj] = useState([]);
+  // const [isTopicPresent,setIsTopicPresent] = useState(true);
   const navigate = useNavigate();
-
   const params = useParams();
 
   useEffect(() => {
-    if( sessionStorage.getItem("user") === null ){
+    if (sessionStorage.getItem("user") === null) {
       navigate("../login");
     }
-  }, [navigate])
+  }, [navigate]);
 
   useEffect(() => {
-    fetch("https://localhost:5001/api/MST_Program/" + params.id)
-        .then((res) => {
-            return res.json();
-        })
-        .then((data) => {
-            setNewProgram(data);
-        })
-        .catch((e) => {
-        })
-    }, [params.id]);
+    fetch("http://localhost:8000/topic")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setTopicObj(data);
+      })
+      .catch((e) => {});
+  }, [navigate]);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/programs/" + params.id)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setNewProgram(data);
+      })
+      .catch((e) => {});
+  }, [params.id]);
+
+  const selectionList = topicObj.map((topic) => {
+    return (
+      <>
+        <option
+          value={topic.topic_name}
+          style={{ textTransform: "capitalize" }}
+        >
+          {topic.topic_name}
+        </option>
+      </>
+    );
+  });
 
   return (
     <div className="main my-5 mx-5 w-75">
@@ -38,9 +61,9 @@ const UpdateByID = () => {
           class="form-control"
           id="exampleFormControlInput1"
           placeholder="Program Name"
-          value={newProgram.program_Name}
+          value={newProgram.program_name}
           onChange={(e) => {
-            setNewProgram({ ...newProgram, program_Name: e.target.value });
+            setNewProgram({ ...newProgram, program_name: e.target.value });
           }}
         />
       </div>
@@ -48,16 +71,53 @@ const UpdateByID = () => {
         <label for="exampleFormControlInput1" class="form-label">
           Program Topic
         </label>
-        <input
+        <select
+          required
+          className="form-control"
+          id="selectionBoxForTopic"
+          value={newProgram.program_topic}
+          style={{ display: "" }}
+          onChange={(e) => {
+            setNewProgram({ ...newProgram, program_topic: e.target.value });
+          }}
+        >
+          <option>Select Topic Name</option>
+          {selectionList}
+        </select>
+        {/* <input
+          required
           type="text"
           class="form-control"
-          id="exampleFormControlInput1"
+          id="textBoxForTopic"
+          style={{ display: "none" }}
           placeholder="Program Topic"
-          value={newProgram.program_Topic}
+          value={newProgram.program_topic}
           onChange={(e) => {
-            setNewProgram({ ...newProgram, program_Topic: e.target.value });
+            setNewProgram({ ...newProgram, program_topic: e.target.value });
           }}
         />
+        <input
+          type="button"
+          className="btn btn-outline-primary my-2"
+          value={"Not Present in list ? Want to add new topic !"}
+          onClick={(e) => {
+            if (
+              document.getElementById("selectionBoxForTopic").style.display ===
+              "none"
+            ) {
+              document.getElementById("selectionBoxForTopic").style.display =
+                "";
+              document.getElementById("textBoxForTopic").style.display = "none";
+              e.target.value = "Not Present in list ? Want to add new topic !";
+            } else {
+              document.getElementById("selectionBoxForTopic").style.display =
+                "none";
+              document.getElementById("textBoxForTopic").style.display = "";
+              setIsTopicPresent(false);
+              e.target.value = "Want to select from list ? ";
+            }
+          }}
+        ></input> */}
       </div>
       <div class="mb-3">
         <label for="exampleFormControlInput1" class="form-label">
@@ -68,9 +128,9 @@ const UpdateByID = () => {
           class="form-control"
           id="exampleFormControlInput1"
           placeholder="Program Link"
-          value={newProgram.program_Link}
+          value={newProgram.program_link}
           onChange={(e) => {
-            setNewProgram({ ...newProgram, program_Link: e.target.value });
+            setNewProgram({ ...newProgram, program_link: e.target.value });
           }}
         />
       </div>
@@ -83,9 +143,9 @@ const UpdateByID = () => {
           class="form-control"
           id="exampleFormControlInput1"
           placeholder="Solution Link"
-          value={newProgram.program_SolutionLink}
+          value={newProgram.solution_link}
           onChange={(e) => {
-            setNewProgram({ ...newProgram, program_SolutionLink: e.target.value });
+            setNewProgram({ ...newProgram, solution_link: e.target.value });
           }}
         />
       </div>
@@ -93,14 +153,15 @@ const UpdateByID = () => {
         <label for="exampleFormControlInput1" class="form-label">
           Difficulty
         </label>
-        <select class="form-control" 
-        value={newProgram.program_Difficulty}
-        onChange={(e) => {
-          setNewProgram({
-            ...newProgram,
-            program_Difficulty: e.target.value,
-          });
-        }}
+        <select
+          class="form-control"
+          value={newProgram.difficulty}
+          onChange={(e) => {
+            setNewProgram({
+              ...newProgram,
+              difficulty: e.target.value,
+            });
+          }}
         >
           <option>Select Difficulty</option>
           <option>Easy</option>
@@ -109,71 +170,87 @@ const UpdateByID = () => {
         </select>
       </div>
       <div class="mb-3">
-        <button type="submit" className="mx-5 btn btn-outline-success" 
+        <button
+          type="submit"
+          className="mx-5 btn btn-outline-success"
           onClick={(e) => {
             e.preventDefault();
             if (
-              newProgram.program_Name === undefined ||
-              newProgram.program_Topic === undefined ||
-              newProgram.program_Topic === "Select Topic Name" ||
-              newProgram.program_Topic === "" ||
-              newProgram.program_Link === undefined ||
-              newProgram.program_SolutionLink === undefined ||
-              newProgram.program_Difficulty === undefined ||
-              newProgram.program_Difficulty === "Select Difficulty"
-            ){
+              newProgram.program_name === undefined ||
+              newProgram.program_topic === undefined ||
+              newProgram.program_topic === "Select Topic Name" ||
+              newProgram.program_topic === "" ||
+              newProgram.program_link === undefined ||
+              newProgram.solution_link === undefined ||
+              newProgram.difficulty === undefined ||
+              newProgram.difficulty === "Select Difficulty"
+            ) {
               Swal.fire({
-                title: 'Error!',
-                text: 'All fields are not fullfilled',
-                icon: 'error',
-                confirmButtonText: "Ok"
-              })
+                title: "Error!",
+                text: "All fields are not fullfilled",
+                icon: "error",
+                confirmButtonText: "Ok",
+              });
               return;
             }
-            fetch(`https://localhost:5001/api/MST_Program/${params.id}`, {
+            // if (!isTopicPresent) {
+            //   fetch("http://localhost:8000/topic", {
+            //     method: "POST",
+            //     headers: {
+            //       Accept: "application/json",
+            //       "Content-type": "application/json",
+            //     },
+            //     body: JSON.stringify({
+            //       topic_name: newProgram.program_topic,
+            //     }),
+            //   }).then((res) => {});
+            // }
+            fetch(`http://localhost:8000/programs/${params.id}`, {
               method: "PUT",
-              headers: { 
-                  "Accept":"application/json",
-                  "Content-type": "application/json" 
+              headers: {
+                Accept: "application/json",
+                "Content-type": "application/json",
               },
               body: JSON.stringify(newProgram),
-              })
+            })
               .then((r) => r.json())
               .then((res) => {
                 Swal.fire({
-                  position: 'top-end',
-                  icon: 'success',
-                  title: 'Data Updated Successfully!',
+                  position: "top-end",
+                  icon: "success",
+                  title: "Data Updated Successfully!",
                   showConfirmButton: false,
-                  timer: 1500
-                })
+                  timer: 1500,
+                });
               })
-              .catch((e)=>{
+              .catch((e) => {
                 Swal.fire({
-                  position: 'top-end',
-                  icon: 'error',
-                  title: 'Some Error Occured!',
+                  position: "top-end",
+                  icon: "error",
+                  title: "Some Error Occured!",
                   showConfirmButton: false,
-                  timer: 1500
-                })
-              })
-  
+                  timer: 1500,
+                });
+              });
+
             setNewProgram({
               ...newProgram,
-              program_Name: "",
-              program_Topic: "",
-              program_Link: "",
-              program_SolutionLink: "",
-              program_Difficulty: "",
+              program_name: "",
+              program_topic: "",
+              program_link: "",
+              solution_link: "",
+              difficulty: "",
             });
           }}
         >
           Update
         </button>
-        <button type="submit" className="btn btn-outline-danger"
-         onClick={(e)=>{
+        <button
+          type="submit"
+          className="btn btn-outline-danger"
+          onClick={(e) => {
             navigate("./../../");
-         }}
+          }}
         >
           Cancel
         </button>

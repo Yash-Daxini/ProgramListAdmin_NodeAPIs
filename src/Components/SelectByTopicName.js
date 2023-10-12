@@ -45,7 +45,7 @@ const SelectByTopicName = () => {
             </Link>
           </td>
           <td>
-            <Link to={program.program_solutionlink} target="_blank">
+            <Link to={program.solution_link} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>

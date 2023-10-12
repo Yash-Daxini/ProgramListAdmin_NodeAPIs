@@ -9,14 +9,14 @@ const SelectAll = () => {
     program_topic: "all",
     difficulty: "all",
   });
-  const [filterArr,setFilterArr] = useState([]);
+  const [filterArr, setFilterArr] = useState([]);
 
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
       navigate("../login");
     }
   }, [navigate]);
-  
+
   useEffect(() => {
     fetch(`http://localhost:8000/programs`)
       .then((res) => {
@@ -37,11 +37,16 @@ const SelectAll = () => {
     setForTopic.add(element.program_topic);
   });
 
-  setForTopic.forEach((element)=>{
+  setForTopic.forEach((element) => {
     topicObj.push(element);
   });
 
-  const Delete = (id) => {
+  const Delete = (id, topic) => {
+    if (programObj.filter((ele) => ele.program_topic === topic).length === 1) {
+      fetch(`http://localhost:8000/topic/deleteFromTopic/${topic}`, {
+        method: "DELETE",
+      }).then((res) => {console.log(topic)});
+    }
     fetch(`http://localhost:8000/programs/${id}`, {
       method: "DELETE",
     })
@@ -88,7 +93,7 @@ const SelectAll = () => {
             </Link>
           </td>
           <td>
-            <Link to={program.program_solutionlink} target="_blank">
+            <Link to={program.solution_link} target="_blank">
               <ion-icon name="link-outline"></ion-icon>
             </Link>
           </td>
@@ -118,7 +123,7 @@ const SelectAll = () => {
                   confirmButtonText: "Yes, delete it!",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    Delete(program._id);
+                    Delete(program._id, program.program_topic);
                   }
                 });
               }}
@@ -151,20 +156,28 @@ const SelectAll = () => {
             value={filterObj.program_topic}
             onChange={(e) => {
               setFilterObj({ ...filterObj, program_topic: e.target.value });
-              if(e.target.value === "all" && filterObj.difficulty === "all"){
+              if (e.target.value === "all" && filterObj.difficulty === "all") {
                 setFilterArr(programObj);
-              }
-              else if(e.target.value === "all"){
-                setFilterArr(programObj.filter((ele)=>ele.difficulty === filterObj.difficulty));
-              }
-              else if(filterObj.difficulty === "all"){
-                let arr = programObj.filter((ele)=>ele.program_topic === e.target.value);
+              } else if (e.target.value === "all") {
+                setFilterArr(
+                  programObj.filter(
+                    (ele) => ele.difficulty === filterObj.difficulty
+                  )
+                );
+              } else if (filterObj.difficulty === "all") {
+                let arr = programObj.filter(
+                  (ele) => ele.program_topic === e.target.value
+                );
                 setFilterArr(arr);
+              } else {
+                setFilterArr(
+                  programObj.filter(
+                    (ele) =>
+                      ele.program_topic === e.target.value &&
+                      ele.difficulty === filterObj.difficulty
+                  )
+                );
               }
-              else{
-                setFilterArr(programObj.filter((ele)=>ele.program_topic === e.target.value && ele.difficulty === filterObj.difficulty));
-              }
-              
             }}
           >
             <option value={"all"}>Select Topic Name</option>
@@ -178,17 +191,29 @@ const SelectAll = () => {
                 ...filterObj,
                 difficulty: e.target.value,
               });
-              if(e.target.value === "all" && filterObj.program_topic === "all"){
+              if (
+                e.target.value === "all" &&
+                filterObj.program_topic === "all"
+              ) {
                 setFilterArr(programObj);
-              }
-              else if(e.target.value === "all"){
-                setFilterArr(programObj.filter((ele)=>ele.program_topic === filterObj.program_topic));
-              }
-              else if(filterObj.program_topic === "all"){
-                setFilterArr(programObj.filter((ele)=>ele.difficulty === e.target.value));
-              }
-              else{
-                setFilterArr(programObj.filter((ele)=>ele.program_topic === filterObj.program_topic && ele.difficulty === e.target.value));
+              } else if (e.target.value === "all") {
+                setFilterArr(
+                  programObj.filter(
+                    (ele) => ele.program_topic === filterObj.program_topic
+                  )
+                );
+              } else if (filterObj.program_topic === "all") {
+                setFilterArr(
+                  programObj.filter((ele) => ele.difficulty === e.target.value)
+                );
+              } else {
+                setFilterArr(
+                  programObj.filter(
+                    (ele) =>
+                      ele.program_topic === filterObj.program_topic &&
+                      ele.difficulty === e.target.value
+                  )
+                );
               }
             }}
           >

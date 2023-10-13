@@ -101,7 +101,7 @@ const SelectAll = () => {
           <td>
             <button className="btn btn-outline-info">
               <Link
-                to={"./UpdateByID/" + program._id}
+                to={"./UpdateByID/" + program._id + "/" + program.program_topic}
                 className="text-decoration-none"
               >
                 <ion-icon name="create-outline"></ion-icon>

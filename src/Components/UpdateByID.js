@@ -4,10 +4,15 @@ import Swal from "sweetalert2";
 
 const UpdateByID = () => {
   const [newProgram, setNewProgram] = useState({});
+  const [listOrTextAreaBtn, setListOrTextAreaBtn] = useState(
+    "Not Present in list ? Want to add new topic !"
+  );
+  const [programs, setPrograms] = useState([]);
   const [topicObj, setTopicObj] = useState([]);
-  // const [isTopicPresent,setIsTopicPresent] = useState(true);
   const navigate = useNavigate();
   const params = useParams();
+
+  let lastTopic = params.topic;
 
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
@@ -16,6 +21,14 @@ const UpdateByID = () => {
   }, [navigate]);
 
   useEffect(() => {
+    fetch("http://localhost:8000/programs")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setPrograms(data);
+      })
+      .catch((e) => {});
     fetch("http://localhost:8000/topic")
       .then((res) => {
         return res.json();
@@ -25,7 +38,6 @@ const UpdateByID = () => {
       })
       .catch((e) => {});
   }, [navigate]);
-
   useEffect(() => {
     fetch("http://localhost:8000/programs/" + params.id)
       .then((res) => {
@@ -84,7 +96,7 @@ const UpdateByID = () => {
           <option>Select Topic Name</option>
           {selectionList}
         </select>
-        {/* <input
+        <input
           required
           type="text"
           class="form-control"
@@ -99,7 +111,7 @@ const UpdateByID = () => {
         <input
           type="button"
           className="btn btn-outline-primary my-2"
-          value={"Not Present in list ? Want to add new topic !"}
+          value={listOrTextAreaBtn}
           onClick={(e) => {
             if (
               document.getElementById("selectionBoxForTopic").style.display ===
@@ -108,16 +120,17 @@ const UpdateByID = () => {
               document.getElementById("selectionBoxForTopic").style.display =
                 "";
               document.getElementById("textBoxForTopic").style.display = "none";
-              e.target.value = "Not Present in list ? Want to add new topic !";
+              setListOrTextAreaBtn(
+                "Not Present in list ? Want to add new topic !"
+              );
             } else {
               document.getElementById("selectionBoxForTopic").style.display =
                 "none";
               document.getElementById("textBoxForTopic").style.display = "";
-              setIsTopicPresent(false);
-              e.target.value = "Want to select from list ? ";
+              setListOrTextAreaBtn("Want to select from list ? ");
             }
           }}
-        ></input> */}
+        ></input>
       </div>
       <div class="mb-3">
         <label for="exampleFormControlInput1" class="form-label">
@@ -193,18 +206,47 @@ const UpdateByID = () => {
               });
               return;
             }
-            // if (!isTopicPresent) {
-            //   fetch("http://localhost:8000/topic", {
-            //     method: "POST",
-            //     headers: {
-            //       Accept: "application/json",
-            //       "Content-type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //       topic_name: newProgram.program_topic,
-            //     }),
-            //   }).then((res) => {});
-            // }
+            let lastIsEq = lastTopic !== newProgram.program_topic;
+            if (lastIsEq) {
+              let count = programs.filter(
+                (ele) =>
+                  ele.program_topic.toLowerCase() === lastTopic.toLowerCase()
+              ).length;
+              if (count === 1) {
+                fetch(
+                  `http://localhost:8000/topic/deleteFromTopic/${lastTopic}`,
+                  {
+                    method: "DELETE",
+                  }
+                ).then((res) => {});
+              }
+            }
+            if (
+              topicObj.filter(
+                (ele) =>
+                  ele.topic_name.toLowerCase() ===
+                  newProgram.program_topic.toLowerCase()
+              ).length === 0
+            ) {
+              fetch("http://localhost:8000/topic", {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-type": "application/json",
+                },
+                body: JSON.stringify({
+                  topic_name: newProgram.program_topic,
+                }),
+              }).then((res) => {
+                console.log(
+                  topicObj.filter(
+                    (ele) =>
+                      ele.topic_name.toLowerCase() ===
+                      newProgram.program_topic.toLowerCase()
+                  ).length
+                );
+              });
+            }
             fetch(`http://localhost:8000/programs/${params.id}`, {
               method: "PUT",
               headers: {
@@ -249,7 +291,7 @@ const UpdateByID = () => {
           type="submit"
           className="btn btn-outline-danger"
           onClick={(e) => {
-            navigate("./../../");
+            navigate("/selectall");
           }}
         >
           Cancel

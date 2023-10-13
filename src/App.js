@@ -26,7 +26,7 @@ function App() {
             <Route path='/SelectAllUser' element={<SelectAllUser />} />
             <Route path='/SelectAllTopic/SelectByTopicName/:name' element={<SelectByTopicName />} />
             <Route path='/SelectAll/SelectByID/:id' element={<SelectByID />} ></Route>
-            <Route path='/SelectAll/UpdateByID/:id' element={<UpdateByID />} ></Route>
+            <Route path='/SelectAll/UpdateByID/:id/:topic' element={<UpdateByID />} ></Route>
             <Route path='/SelectAllUser/UpdateByIDUser/:id' element={<UpdateByIDUser />} ></Route>
             <Route path='/Insert' element={<Insert />} />
             <Route path='/InsertUser' element={<InsertUser />} />

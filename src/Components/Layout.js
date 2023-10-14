@@ -6,7 +6,7 @@ const Layout = ()=>{
     return(
         <>
             <Sidebar />
-            <div class="main">
+            <div class="main ligthTheme">
                 <Topbar />
                 <Outlet />
             </div>

@@ -44,7 +44,7 @@ const Insert = () => {
   return (
     <div className="main my-5 mx-5 w-75">
       <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">
+        <label for="exampleFormControlInput1 my-5" class="form-label">
           Program Name
         </label>
         <input

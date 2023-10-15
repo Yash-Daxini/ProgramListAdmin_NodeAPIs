@@ -26,12 +26,12 @@ const Topbar = () => {
           </div>
           <div class="name">ProgramList</div>
         </div>
-        <button className="themeBtn w-25 h-75 darkTheme" onClick={(e)=>{
+        {/* <button className="themeBtn w-25 h-75 darkTheme" onClick={(e)=>{
           e.target.classList.toggle("darkTheme");
           e.target.classList.toggle("lightTheme");
           document.getElementsByClassName("main")[0].classList.toggle("lightTheme");
           document.getElementsByClassName("main")[0].classList.toggle("darkTheme");
-        }}>Change theme</button>
+        }}>Change theme</button> */}
         <div>
           <button class="logout btn border-0 text-primary" onClick={(e)=>{
             sessionStorage.clear();

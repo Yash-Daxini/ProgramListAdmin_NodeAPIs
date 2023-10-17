@@ -5,12 +5,14 @@ import Swal from "sweetalert2";
 const SelectAll = () => {
   const navigate = useNavigate();
   const [programObj, setProgramObj] = useState([]);
+  const [isAnyChecked, setIsAnyChecked] = useState(false);
   const [filterObj, setFilterObj] = useState({
     program_topic: "all",
     difficulty: "all",
   });
-  const [filterArr, setFilterArr] = useState([]);
+  const [deleteArr, setDeleteArr] = useState([]);
 
+  const [filterArr, setFilterArr] = useState([]);
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
       navigate("../login");
@@ -41,11 +43,19 @@ const SelectAll = () => {
     topicObj.push(element);
   });
 
+  let deleteFromArray = ()=>{
+    deleteArr.forEach(element => {
+      Delete(element.id,element.topic)
+    });
+  }
+
   const Delete = (id, topic) => {
     if (programObj.filter((ele) => ele.program_topic === topic).length === 1) {
       fetch(`http://localhost:8000/topic/deleteFromTopic/${topic}`, {
         method: "DELETE",
-      }).then((res) => {console.log(topic)});
+      }).then((res) => {
+        console.log(topic);
+      });
     }
     fetch(`http://localhost:8000/programs/${id}`, {
       method: "DELETE",
@@ -78,6 +88,37 @@ const SelectAll = () => {
     return (
       <>
         <tr>
+          <td>
+            <input
+              type="checkbox"
+              onChange={(e) => {
+                if (e.target.checked === true) {
+                  if (isAnyChecked === false) {
+                    setIsAnyChecked(true);
+                  }
+                  console.warn("selected" + program._id);
+                  deleteArr.push({id:program._id,topic:program.program_topic});
+                  setDeleteArr(deleteArr);
+                  console.warn(deleteArr);
+                } else {
+                  let index = 0;
+                  deleteArr.forEach((element,ind) => {
+                    if( element.id === program._id && element.topic === program.program_topic ){
+                      index = ind;
+                      // break;
+                    }
+                  });
+                  console.warn(index);
+                  if( index !== 0 ) deleteArr.splice(index, index);
+                  else deleteArr.shift();
+                  setDeleteArr(deleteArr);
+                  console.warn(deleteArr);
+                }
+                if (isAnyChecked === true && deleteArr.length === 0)
+                  setIsAnyChecked(false);
+              }}
+            />
+          </td>
           <td>
             <Link
               to={"./SelectByID/" + program._id}
@@ -224,7 +265,19 @@ const SelectAll = () => {
           </select>
         </div>
         <div>
-          <Link className="successAddBtn rounded-3 m-2" to={"../Insert"}>
+          {!isAnyChecked ? (
+            <button
+              className="btn btn-outline-danger"
+              style={{ display: "none" }}
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          ) : (
+            <button className="btn btn-outline-danger" onClick={()=>{deleteFromArray()}}>
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          )}
+          <Link className="successAddBtn btn rounded-3 m-2" to={"../Insert"}>
             <ion-icon name="add-outline"></ion-icon>
           </Link>
         </div>
@@ -233,6 +286,7 @@ const SelectAll = () => {
         <table class="table table-borderless">
           <thead>
             <tr>
+              <th scope="col"></th>
               <th scope="col">Name</th>
               <th scope="col">Topic</th>
               <th scope="col">Program Link</th>

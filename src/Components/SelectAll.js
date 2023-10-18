@@ -124,33 +124,81 @@ const SelectAll = () => {
               to={"./SelectByID/" + program._id}
               style={{ textDecoration: "none" }}
             >
-              {program.program_name}
+              <p className={`display${program._id}`}>{program.program_name}</p>
+              <input type="hidden" className={`edit${program._id} form-control`} value={program.program_name}/>
             </Link>
           </td>
-          <td>{program.program_topic}</td>
           <td>
-            <Link to={program.program_link} target="_blank">
-              <ion-icon name="link-outline"></ion-icon>
-            </Link>
+          <p className={`display${program._id}`}>{program.program_topic}</p>
+            <input type="hidden" className={`edit${program._id} form-control`} value={program.program_topic}/>
+            </td>
+          <td>
+          <Link to={program.program_link} target="_blank">
+              <p className={`display${program._id}`}><ion-icon name="link-outline"></ion-icon></p>
+          </Link>
+          <input type="hidden" className={`edit${program._id} form-control`} value={program.program_link}/>
           </td>
           <td>
             <Link to={program.solution_link} target="_blank">
-              <ion-icon name="link-outline"></ion-icon>
+            <p className={`display${program._id}`}><ion-icon name="link-outline"></ion-icon></p>
             </Link>
+            <input type="hidden" className={`edit${program._id} form-control`} value={program.solution_link}/>
           </td>
-          <td>{program.difficulty}</td>
+          <td><p className={`display${program._id}`}>{program.difficulty}</p>
+          <select
+          class={`form-control editSelect${program._id}`}
+          value={program.difficulty}
+          style={{display:"none"}}
+          // onChange={(e) => {
+          //   // setNewProgram({
+          //   //   ...pr,
+          //   //   difficulty: e.target.value,
+          //   // });
+          // }}
+        >
+          <option>Select Difficulty</option>
+          <option>Easy</option>
+          <option>Medium</option>
+          <option>Hard</option>
+        </select>
+          </td>
           <td>
-            <button className="btn btn-outline-info">
-              <Link
+            <button className="btn btn-outline-info" onClick={()=>{
+              let arr = document.getElementsByClassName(`display${program._id}`);
+              // console.warn(arr);
+              for( let k in arr ){
+                let e = arr[k];
+                try{
+                  if( e !== undefined ) e.style.display = "none";
+                }
+                catch(exce){
+                  // console.warn(exce);
+                }
+                // console.warn( k + " "  + e.style);
+              }
+              arr = document.getElementsByClassName(`edit${program._id}`);
+              // console.warn(arr);
+              
+              for( let k in arr ){
+                let e = arr[k];
+                if( k !== 'length' ) e.type = "text";
+                // console.warn( k + " "  + e);
+              }
+              arr = document.getElementsByClassName(`editSelect${program._id}`)[0];
+              arr.style.display = "block";
+              // console.warn(document.getElementById("editIcon"));
+              document.getElementById("editIcon").name = "checkmark-outline"
+            }}>
+              {/* <Link
                 to={"./UpdateByID/" + program._id + "/" + program.program_topic}
                 className="text-decoration-none"
-              >
-                <ion-icon name="create-outline"></ion-icon>
-              </Link>
+              > */}
+                <ion-icon id="editIcon" name="create-outline"></ion-icon>
+              {/* </Link> */}
             </button>
           </td>
           <td>
-            <button
+            {/* <button
               type="submit"
               className="btn btn-outline-danger"
               onClick={(e) => {
@@ -170,7 +218,7 @@ const SelectAll = () => {
               }}
             >
               <ion-icon name="trash-outline"></ion-icon>
-            </button>
+            </button> */}
           </td>
         </tr>
       </>

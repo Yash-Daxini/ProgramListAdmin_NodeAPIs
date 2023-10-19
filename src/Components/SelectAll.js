@@ -11,7 +11,7 @@ const SelectAll = () => {
     difficulty: "all",
   });
   const [deleteArr, setDeleteArr] = useState([]);
-
+  // const [updateObj, setUpdateObj] = useState({});
   const [filterArr, setFilterArr] = useState([]);
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
@@ -43,11 +43,11 @@ const SelectAll = () => {
     topicObj.push(element);
   });
 
-  let deleteFromArray = ()=>{
-    deleteArr.forEach(element => {
-      Delete(element.id,element.topic)
+  let deleteFromArray = () => {
+    deleteArr.forEach((element) => {
+      Delete(element.id, element.topic);
     });
-  }
+  };
 
   const Delete = (id, topic) => {
     if (programObj.filter((ele) => ele.program_topic === topic).length === 1) {
@@ -85,6 +85,7 @@ const SelectAll = () => {
   };
 
   const allPrograms = filterArr.map((program) => {
+    // setUpdateObj(program);
     return (
       <>
         <tr>
@@ -97,19 +98,25 @@ const SelectAll = () => {
                     setIsAnyChecked(true);
                   }
                   console.warn("selected" + program._id);
-                  deleteArr.push({id:program._id,topic:program.program_topic});
+                  deleteArr.push({
+                    id: program._id,
+                    topic: program.program_topic,
+                  });
                   setDeleteArr(deleteArr);
                   console.warn(deleteArr);
                 } else {
                   let index = 0;
-                  deleteArr.forEach((element,ind) => {
-                    if( element.id === program._id && element.topic === program.program_topic ){
+                  deleteArr.forEach((element, ind) => {
+                    if (
+                      element.id === program._id &&
+                      element.topic === program.program_topic
+                    ) {
                       index = ind;
                       // break;
                     }
                   });
                   console.warn(index);
-                  if( index !== 0 ) deleteArr.splice(index, index);
+                  if (index !== 0) deleteArr.splice(index, index);
                   else deleteArr.shift();
                   setDeleteArr(deleteArr);
                   console.warn(deleteArr);
@@ -125,75 +132,134 @@ const SelectAll = () => {
               style={{ textDecoration: "none" }}
             >
               <p className={`display${program._id}`}>{program.program_name}</p>
-              <input type="hidden" className={`edit${program._id} form-control`} value={program.program_name}/>
             </Link>
+            <input
+              type="hidden"
+              className={`edit${program._id} form-control border-0`}
+              value={program.program_name}
+              onChange={(e) => {
+                // setUpdateObj({ ...updateObj, program_name: e.target.value });
+              }}
+            />
           </td>
           <td>
-          <p className={`display${program._id}`}>{program.program_topic}</p>
-            <input type="hidden" className={`edit${program._id} form-control`} value={program.program_topic}/>
-            </td>
+            <p className={`display${program._id}`}>{program.program_topic}</p>
+            <input
+              type="hidden"
+              className={`edit${program._id} form-control border-0`}
+              value={program.program_topic}
+              onChange={(e) => {
+                // program.program_topic = e.target.value;
+                // setUpdateObj({ ...updateObj, program_topic: e.target.value });
+              }}
+            />
+          </td>
           <td>
-          <Link to={program.program_link} target="_blank">
-              <p className={`display${program._id}`}><ion-icon name="link-outline"></ion-icon></p>
-          </Link>
-          <input type="hidden" className={`edit${program._id} form-control`} value={program.program_link}/>
+            <Link to={program.program_link} target="_blank">
+              <p className={`display${program._id}`}>
+                <ion-icon name="link-outline"></ion-icon>
+              </p>
+            </Link>
+            <input
+              type="hidden"
+              className={`edit${program._id} form-control border-0`}
+              value={program.program_link}
+              onChange={(e) => {
+                // setUpdateObj({ ...updateObj, program_link: e.target.value });
+              }}
+            />
           </td>
           <td>
             <Link to={program.solution_link} target="_blank">
-            <p className={`display${program._id}`}><ion-icon name="link-outline"></ion-icon></p>
+              <p className={`display${program._id}`}>
+                <ion-icon name="link-outline"></ion-icon>
+              </p>
             </Link>
-            <input type="hidden" className={`edit${program._id} form-control`} value={program.solution_link}/>
-          </td>
-          <td><p className={`display${program._id}`}>{program.difficulty}</p>
-          <select
-          class={`form-control editSelect${program._id}`}
-          value={program.difficulty}
-          style={{display:"none"}}
-          // onChange={(e) => {
-          //   // setNewProgram({
-          //   //   ...pr,
-          //   //   difficulty: e.target.value,
-          //   // });
-          // }}
-        >
-          <option>Select Difficulty</option>
-          <option>Easy</option>
-          <option>Medium</option>
-          <option>Hard</option>
-        </select>
+            <input
+              type="hidden"
+              className={`edit${program._id} form-control border-0`}
+              value={program.solution_link}
+              onChange={(e) => {
+                // setUpdateObj({ ...updateObj, solution_link: e.target.value });
+              }}
+            />
           </td>
           <td>
-            <button className="btn btn-outline-info" onClick={()=>{
-              let arr = document.getElementsByClassName(`display${program._id}`);
-              // console.warn(arr);
-              for( let k in arr ){
-                let e = arr[k];
-                try{
-                  if( e !== undefined ) e.style.display = "none";
+            <p className={`display${program._id}`}>{program.difficulty}</p>
+            <select
+              class={`form-control editSelect${program._id} border-0`}
+              value={program.difficulty}
+              style={{ display: "none" }}
+              onChange={(e) => {
+                // setUpdateObj({ ...updateObj, program_name: e.target.value });
+              }}
+            >
+              <option>Select Difficulty</option>
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </td>
+          <td>
+            <button
+              className="btn btn-outline-info"
+              onClick={() => {
+                if (
+                  document.getElementById(`editIcon${program._id}`).name === "create-outline"
+                ) {
+                  let arr = document.getElementsByClassName(
+                    `display${program._id}`
+                  );
+                  for (let k in arr) {
+                    let e = arr[k];
+                    try {
+                      e.style.display = "none";
+                    } catch (exce) {
+                    }
+                  }
+                  arr = document.getElementsByClassName(`edit${program._id}`);
+
+                  for (let k in arr) {
+                    let e = arr[k];
+                    if (k !== "length") e.type = "text";
+                  }
+                  arr = document.getElementsByClassName(
+                    `editSelect${program._id}`
+                  )[0];
+                  arr.style.display = "block";
+                  document.getElementById(`editIcon${program._id}`).name =
+                    "checkmark-outline";
+                } else {
+                  console.warn(program.program_name);
+                  let arr = document.getElementsByClassName(
+                    `display${program._id}`
+                  );
+                  for (let k in arr) {
+                    let e = arr[k];
+                    try {
+                      e.style.display = "block";
+                    } catch (exce) {
+                    }
+                  }
+                  arr = document.getElementsByClassName(`edit${program._id}`);
+
+                  for (let k in arr) {
+                    let e = arr[k];
+                    if (k !== "length") e.type = "hidden";
+                  }
+                  arr = document.getElementsByClassName(
+                    `editSelect${program._id}`
+                  )[0];
+                  arr.style.display = "none";
+                  document.getElementById(`editIcon${program._id}`).name = "create-outline";
                 }
-                catch(exce){
-                  // console.warn(exce);
-                }
-                // console.warn( k + " "  + e.style);
-              }
-              arr = document.getElementsByClassName(`edit${program._id}`);
-              // console.warn(arr);
-              
-              for( let k in arr ){
-                let e = arr[k];
-                if( k !== 'length' ) e.type = "text";
-                // console.warn( k + " "  + e);
-              }
-              arr = document.getElementsByClassName(`editSelect${program._id}`)[0];
-              arr.style.display = "block";
-              // console.warn(document.getElementById("editIcon"));
-              document.getElementById("editIcon").name = "checkmark-outline"
-            }}>
+              }}
+            >
               {/* <Link
                 to={"./UpdateByID/" + program._id + "/" + program.program_topic}
                 className="text-decoration-none"
               > */}
-                <ion-icon id="editIcon" name="create-outline"></ion-icon>
+              <ion-icon id={`editIcon${program._id}`} name="create-outline"></ion-icon>
               {/* </Link> */}
             </button>
           </td>
@@ -321,7 +387,12 @@ const SelectAll = () => {
               <ion-icon name="trash-outline"></ion-icon>
             </button>
           ) : (
-            <button className="btn btn-outline-danger" onClick={()=>{deleteFromArray()}}>
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => {
+                deleteFromArray();
+              }}
+            >
               <ion-icon name="trash-outline"></ion-icon>
             </button>
           )}

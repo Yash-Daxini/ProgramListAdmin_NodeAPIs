@@ -11,7 +11,7 @@ const SelectAll = () => {
     difficulty: "all",
   });
   const [deleteArr, setDeleteArr] = useState([]);
-  // const [updateObj, setUpdateObj] = useState({});
+  const [updateObj, setUpdateObj] = useState({});
   const [filterArr, setFilterArr] = useState([]);
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
@@ -83,9 +83,8 @@ const SelectAll = () => {
         });
       });
   };
-
+  // const
   const allPrograms = filterArr.map((program) => {
-    // setUpdateObj(program);
     return (
       <>
         <tr>
@@ -97,13 +96,13 @@ const SelectAll = () => {
                   if (isAnyChecked === false) {
                     setIsAnyChecked(true);
                   }
-                  console.warn("selected" + program._id);
+                  // console.warn("selected" + program._id);
                   deleteArr.push({
                     id: program._id,
                     topic: program.program_topic,
                   });
                   setDeleteArr(deleteArr);
-                  console.warn(deleteArr);
+                  // console.warn(deleteArr);
                 } else {
                   let index = 0;
                   deleteArr.forEach((element, ind) => {
@@ -119,7 +118,7 @@ const SelectAll = () => {
                   if (index !== 0) deleteArr.splice(index, index);
                   else deleteArr.shift();
                   setDeleteArr(deleteArr);
-                  console.warn(deleteArr);
+                  // console.warn(deleteArr);
                 }
                 if (isAnyChecked === true && deleteArr.length === 0)
                   setIsAnyChecked(false);
@@ -136,9 +135,9 @@ const SelectAll = () => {
             <input
               type="hidden"
               className={`edit${program._id} form-control border-0`}
-              value={program.program_name}
+              value={updateObj.program_name}
               onChange={(e) => {
-                // setUpdateObj({ ...updateObj, program_name: e.target.value });
+                setUpdateObj({ ...updateObj, program_name: e.target.value });
               }}
             />
           </td>
@@ -147,15 +146,15 @@ const SelectAll = () => {
             <input
               type="hidden"
               className={`edit${program._id} form-control border-0`}
-              value={program.program_topic}
+              value={updateObj.program_topic}
               onChange={(e) => {
                 // program.program_topic = e.target.value;
-                // setUpdateObj({ ...updateObj, program_topic: e.target.value });
+                setUpdateObj({ ...updateObj, program_topic: e.target.value });
               }}
             />
           </td>
           <td>
-            <Link to={program.program_link} target="_blank">
+            <Link to={updateObj.program_link} target="_blank">
               <p className={`display${program._id}`}>
                 <ion-icon name="link-outline"></ion-icon>
               </p>
@@ -163,14 +162,14 @@ const SelectAll = () => {
             <input
               type="hidden"
               className={`edit${program._id} form-control border-0`}
-              value={program.program_link}
+              value={updateObj.program_link}
               onChange={(e) => {
-                // setUpdateObj({ ...updateObj, program_link: e.target.value });
+                setUpdateObj({ ...updateObj, program_link: e.target.value });
               }}
             />
           </td>
           <td>
-            <Link to={program.solution_link} target="_blank">
+            <Link to={updateObj.solution_link} target="_blank">
               <p className={`display${program._id}`}>
                 <ion-icon name="link-outline"></ion-icon>
               </p>
@@ -178,9 +177,9 @@ const SelectAll = () => {
             <input
               type="hidden"
               className={`edit${program._id} form-control border-0`}
-              value={program.solution_link}
+              value={updateObj.solution_link}
               onChange={(e) => {
-                // setUpdateObj({ ...updateObj, solution_link: e.target.value });
+                setUpdateObj({ ...updateObj, solution_link: e.target.value });
               }}
             />
           </td>
@@ -188,10 +187,10 @@ const SelectAll = () => {
             <p className={`display${program._id}`}>{program.difficulty}</p>
             <select
               class={`form-control editSelect${program._id} border-0`}
-              value={program.difficulty}
+              value={updateObj.difficulty}
               style={{ display: "none" }}
               onChange={(e) => {
-                // setUpdateObj({ ...updateObj, program_name: e.target.value });
+                setUpdateObj({ ...updateObj, program_name: e.target.value });
               }}
             >
               <option>Select Difficulty</option>
@@ -205,7 +204,8 @@ const SelectAll = () => {
               className="btn btn-outline-info"
               onClick={() => {
                 if (
-                  document.getElementById(`editIcon${program._id}`).name === "create-outline"
+                  document.getElementById(`editIcon${program._id}`).name ===
+                  "create-outline"
                 ) {
                   let arr = document.getElementsByClassName(
                     `display${program._id}`
@@ -214,8 +214,7 @@ const SelectAll = () => {
                     let e = arr[k];
                     try {
                       e.style.display = "none";
-                    } catch (exce) {
-                    }
+                    } catch (exce) {}
                   }
                   arr = document.getElementsByClassName(`edit${program._id}`);
 
@@ -229,17 +228,48 @@ const SelectAll = () => {
                   arr.style.display = "block";
                   document.getElementById(`editIcon${program._id}`).name =
                     "checkmark-outline";
+                  setUpdateObj(program);
                 } else {
-                  console.warn(program.program_name);
+                  fetch(`http://localhost:8000/programs/${updateObj._id}`, {
+                    method: "PUT",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(updateObj),
+                  })
+                    .then((r) => r.json())
+                    .then((res) => {
+                      Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "Data Updated Successfully!",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                    })
+                    .catch((e) => {
+                      Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Some Error Occured!",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                    });
                   let arr = document.getElementsByClassName(
                     `display${program._id}`
                   );
+                  let values = [];
+                  for( let val in updateObj ) values.push(updateObj[val]);
+                  let index = 1;
                   for (let k in arr) {
                     let e = arr[k];
                     try {
                       e.style.display = "block";
-                    } catch (exce) {
-                    }
+                      if( index === 2 || index === 3 ) continue;
+                      e.innerText = values[index++];
+                    } catch (exce) {}
                   }
                   arr = document.getElementsByClassName(`edit${program._id}`);
 
@@ -251,7 +281,8 @@ const SelectAll = () => {
                     `editSelect${program._id}`
                   )[0];
                   arr.style.display = "none";
-                  document.getElementById(`editIcon${program._id}`).name = "create-outline";
+                  document.getElementById(`editIcon${program._id}`).name =
+                    "create-outline";
                 }
               }}
             >
@@ -259,7 +290,10 @@ const SelectAll = () => {
                 to={"./UpdateByID/" + program._id + "/" + program.program_topic}
                 className="text-decoration-none"
               > */}
-              <ion-icon id={`editIcon${program._id}`} name="create-outline"></ion-icon>
+              <ion-icon
+                id={`editIcon${program._id}`}
+                name="create-outline"
+              ></ion-icon>
               {/* </Link> */}
             </button>
           </td>

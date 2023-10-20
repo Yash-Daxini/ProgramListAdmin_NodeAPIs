@@ -29,7 +29,7 @@ const SelectAll = () => {
         setFilterArr(data);
       })
       .catch((e) => {});
-  }, []);
+  }, [updateObj]);
 
   let setForTopic = new Set();
 
@@ -87,7 +87,7 @@ const SelectAll = () => {
   const allPrograms = filterArr.map((program) => {
     return (
       <>
-        <tr>
+        <tr className={`display${program._id}`}>
           <td>
             <input
               type="checkbox"
@@ -111,7 +111,6 @@ const SelectAll = () => {
                       element.topic === program.program_topic
                     ) {
                       index = ind;
-                      // break;
                     }
                   });
                   console.warn(index);
@@ -125,27 +124,35 @@ const SelectAll = () => {
               }}
             />
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <Link
               to={"./SelectByID/" + program._id}
               style={{ textDecoration: "none" }}
             >
               <p className={`display${program._id}`}>{program.program_name}</p>
             </Link>
+            <label style={{ display: "none" }} className={`edit${program._id}`}>
+              <h5>Program Name</h5>
+            </label>
             <input
+              // style={{ display: "none" }}
               type="hidden"
-              className={`edit${program._id} form-control border-0`}
+              className={`edit${program._id} form-control border-3`}
               value={updateObj.program_name}
               onChange={(e) => {
                 setUpdateObj({ ...updateObj, program_name: e.target.value });
               }}
             />
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <p className={`display${program._id}`}>{program.program_topic}</p>
+            <label style={{ display: "none" }} className={`edit${program._id}`}>
+              <h5>Program Topic</h5>
+            </label>
             <input
+              // style={{ display: "none" }}
               type="hidden"
-              className={`edit${program._id} form-control border-0`}
+              className={`edit${program._id} form-control border-3`}
               value={updateObj.program_topic}
               onChange={(e) => {
                 // program.program_topic = e.target.value;
@@ -153,44 +160,55 @@ const SelectAll = () => {
               }}
             />
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <Link to={updateObj.program_link} target="_blank">
               <p className={`display${program._id}`}>
                 <ion-icon name="link-outline"></ion-icon>
               </p>
             </Link>
+            <label style={{ display: "none" }} className={`edit${program._id}`}>
+              <h5>Problem Link</h5>
+            </label>
             <input
+              // style={{ display: "none" }}
               type="hidden"
-              className={`edit${program._id} form-control border-0`}
+              className={`edit${program._id} form-control border-3`}
               value={updateObj.program_link}
               onChange={(e) => {
                 setUpdateObj({ ...updateObj, program_link: e.target.value });
               }}
             />
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <Link to={updateObj.solution_link} target="_blank">
               <p className={`display${program._id}`}>
                 <ion-icon name="link-outline"></ion-icon>
               </p>
             </Link>
+            <label style={{ display: "none" }} className={`edit${program._id}`}>
+              <h5>Solution Link</h5>
+            </label>
             <input
+              // style={{ display: "none" }}
               type="hidden"
-              className={`edit${program._id} form-control border-0`}
+              className={`edit${program._id} form-control border-3`}
               value={updateObj.solution_link}
               onChange={(e) => {
                 setUpdateObj({ ...updateObj, solution_link: e.target.value });
               }}
             />
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <p className={`display${program._id}`}>{program.difficulty}</p>
+            <label style={{ display: "none" }} className={`edit${program._id}`}>
+              <h5>Difficulty</h5>
+            </label>
             <select
-              class={`form-control editSelect${program._id} border-0`}
+              class={`form-control editSelect${program._id} border-3`}
               value={updateObj.difficulty}
               style={{ display: "none" }}
               onChange={(e) => {
-                setUpdateObj({ ...updateObj, program_name: e.target.value });
+                setUpdateObj({ ...updateObj, difficulty: e.target.value });
               }}
             >
               <option>Select Difficulty</option>
@@ -199,7 +217,7 @@ const SelectAll = () => {
               <option>Hard</option>
             </select>
           </td>
-          <td>
+          <td className={`display${program._id}`}>
             <button
               className="btn btn-outline-info"
               onClick={() => {
@@ -207,27 +225,58 @@ const SelectAll = () => {
                   document.getElementById(`editIcon${program._id}`).name ===
                   "create-outline"
                 ) {
-                  let arr = document.getElementsByClassName(
-                    `display${program._id}`
-                  );
+                  let arr = document.getElementsByTagName(`tr`);
+
                   for (let k in arr) {
                     let e = arr[k];
                     try {
-                      e.style.display = "none";
+                      if (
+                        k !== "length" &&
+                        !e.classList.contains(`display${program._id}`)
+                      )
+                        e.style.filter = "blur(5px)";
+                    } catch (exce) {}
+                  }
+
+                  arr = document.getElementsByClassName(
+                    `display${program._id}`
+                  );
+
+                  for (let k in arr) {
+                    let e = arr[k];
+                    try {
+                      if (e.tagName !== "TD" && e.tagName !== "TR") {
+                        e.style.display = "none";
+                      } else if (e.tagName === "TR") {
+                        e.style.position = "relative";
+                        e.style.left = "30%";
+                      } else if (e.tagName === "TD") {
+                        e.style.display = "block";
+                      }
                     } catch (exce) {}
                   }
                   arr = document.getElementsByClassName(`edit${program._id}`);
 
                   for (let k in arr) {
                     let e = arr[k];
-                    if (k !== "length") e.type = "text";
+                    try {
+                      // } catch (exce) {
+                      if (k !== "length") {
+                        e.type = "text";
+                        e.style.display = "block";
+                      }
+                    } catch (exce) {}
                   }
-                  arr = document.getElementsByClassName(
+                  let htmlElement = document.getElementsByClassName(
                     `editSelect${program._id}`
                   )[0];
-                  arr.style.display = "block";
+                  htmlElement.style.display = "block";
                   document.getElementById(`editIcon${program._id}`).name =
                     "checkmark-outline";
+                  htmlElement = document.getElementsByClassName(
+                    `editSelect${program._id}`
+                  )[0];
+                  htmlElement.style.display = "block";
                   setUpdateObj(program);
                 } else {
                   fetch(`http://localhost:8000/programs/${updateObj._id}`, {
@@ -240,6 +289,7 @@ const SelectAll = () => {
                   })
                     .then((r) => r.json())
                     .then((res) => {
+                      setUpdateObj({});
                       Swal.fire({
                         position: "top-end",
                         icon: "success",
@@ -257,32 +307,56 @@ const SelectAll = () => {
                         timer: 1500,
                       });
                     });
-                  let arr = document.getElementsByClassName(
+                  let arr = document.getElementsByTagName(`tr`);
+
+                  for (let k in arr) {
+                    let e = arr[k];
+                    try {
+                      if (
+                        k !== "length" &&
+                        !e.classList.contains(`display${program._id}`)
+                      )
+                        e.style.filter = "blur(0px)";
+                    } catch (exce) {}
+                  }
+
+                  arr = document.getElementsByClassName(
                     `display${program._id}`
                   );
                   let values = [];
-                  for( let val in updateObj ) values.push(updateObj[val]);
+                  for (let val in updateObj) values.push(updateObj[val]);
                   let index = 1;
                   for (let k in arr) {
                     let e = arr[k];
                     try {
-                      e.style.display = "block";
-                      if( index === 2 || index === 3 ) continue;
-                      e.innerText = values[index++];
+                      if (e.tagName === "TR") {
+                        e.style.position = "revert";
+                        continue;
+                      }
+                      e.style.display = "revert";
+                      if (index === 2 || index === 3) continue;
+                      if (e.tagName !== "TD") e.innerText = values[index++];
                     } catch (exce) {}
                   }
                   arr = document.getElementsByClassName(`edit${program._id}`);
 
                   for (let k in arr) {
                     let e = arr[k];
-                    if (k !== "length") e.type = "hidden";
+                    try {
+                      if (k !== "length") {
+                        e.style.display = "none";
+                        e.type = "hidden";
+                      }
+                    } catch (exce) {}
                   }
-                  arr = document.getElementsByClassName(
-                    `editSelect${program._id}`
-                  )[0];
-                  arr.style.display = "none";
-                  document.getElementById(`editIcon${program._id}`).name =
-                    "create-outline";
+                  try {
+                    arr = document.getElementsByClassName(
+                      `editSelect${program._id}`
+                    )[0];
+                    arr.style.display = "none";
+                    document.getElementById(`editIcon${program._id}`).name =
+                      "create-outline";
+                  } catch (exce) {}
                 }
               }}
             >
@@ -459,7 +533,7 @@ const SelectAll = () => {
               </tr>
             </tbody>
           ) : (
-            <tbody>{allPrograms}</tbody>
+            <tbody className="text-center">{allPrograms}</tbody>
           )}
         </table>
       </div>

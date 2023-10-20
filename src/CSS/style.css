@@ -15,6 +15,12 @@ html {
         font-size: 16px;
     }
 }
+table tr,table td{
+    transition: 0.8s;
+}
+/* input,label{ */
+    /* transition: 2s; */
+/* } */
 /* .lightTheme{
     background-color:#fff;
     color: rgb(40 40 40/1);

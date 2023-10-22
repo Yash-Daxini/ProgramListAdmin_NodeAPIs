@@ -5,6 +5,9 @@ import Swal from "sweetalert2";
 const SelectAll = () => {
   const navigate = useNavigate();
   const [programObj, setProgramObj] = useState([]);
+  const [listOrTextAreaBtn, setListOrTextAreaBtn] = useState(
+    "Not Present in list ? Want to add new topic !"
+  );
   const [isAnyChecked, setIsAnyChecked] = useState(false);
   const [filterObj, setFilterObj] = useState({
     program_topic: "all",
@@ -83,6 +86,17 @@ const SelectAll = () => {
         });
       });
   };
+
+  const selectionList = topicObj.map((topic) => {
+    return (
+      <>
+        <option value={topic} style={{ textTransform: "capitalize" }}>
+          {topic}
+        </option>
+      </>
+    );
+  });
+
   // const
   const allPrograms = filterArr.map((program) => {
     return (
@@ -149,7 +163,19 @@ const SelectAll = () => {
             <label style={{ display: "none" }} className={`edit${program._id}`}>
               <h5>Program Topic</h5>
             </label>
-            <input
+            <select
+              className={`form-control edit${program._id}`}
+              style={{ display: "none" }}
+              id={`selectionBoxForTopic${program._id}`}
+              value={updateObj.program_topic}
+              onChange={(e) => {
+                setUpdateObj({ ...updateObj, program_topic: e.target.value });
+              }}
+            >
+              <option>Select Topic Name</option>
+              {selectionList}
+            </select>
+            {/* <input
               // style={{ display: "none" }}
               type="hidden"
               className={`edit${program._id} form-control border-3`}
@@ -158,13 +184,61 @@ const SelectAll = () => {
                 // program.program_topic = e.target.value;
                 setUpdateObj({ ...updateObj, program_topic: e.target.value });
               }}
+            /> */}
+            <input
+              required
+              type="text"
+              class={`form-control`}
+              id={`textBoxForTopic${program._id}`}
+              style={{ display: "none"}}
+              placeholder="Program Topic"
+              value={updateObj.program_topic}
+              onChange={(e) => {
+                setUpdateObj({ ...updateObj, program_topic: e.target.value });
+              }}
             />
+            <input
+              type="button"
+              style={{ display: "none" , width: "500px"}}
+              className={`btn btn-outline-primary my-3 edit${program._id}`}
+              value={listOrTextAreaBtn}
+              onClick={(e) => {
+                try {
+                  if (
+                    document.getElementById(`selectionBoxForTopic${program._id}`).style
+                      .display === "none"
+                  ) {
+                    document.getElementById(
+                      `selectionBoxForTopic${program._id}`
+                    ).style.display = "block";
+                    document.getElementById(
+                      `textBoxForTopic${program._id}`
+                    ).style.display = "none";
+                    setListOrTextAreaBtn(
+                      "Not Present in list ? Want to add new topic !"
+                    );
+                  } else {
+                    document.getElementById(
+                      `selectionBoxForTopic${program._id}`
+                    ).style.display = "none";
+                    document.getElementById(
+                      `textBoxForTopic${program._id}`
+                    ).style.display = "block";
+                    setListOrTextAreaBtn("Want to select from list ? ");
+                  }
+                } catch (exce) {}
+              }}
+            ></input>
           </td>
           <td className={`display${program._id}`}>
-            <Link to={updateObj.program_link} target="_blank">
-              <p className={`display${program._id}`}>
-                <ion-icon name="link-outline"></ion-icon>
-              </p>
+            <Link
+              to={program.program_link}
+              className={`display${program._id}`}
+              target="_blank"
+            >
+              {/* <p > */}
+              <ion-icon name="link-outline"></ion-icon>
+              {/* </p> */}
             </Link>
             <label style={{ display: "none" }} className={`edit${program._id}`}>
               <h5>Problem Link</h5>
@@ -180,10 +254,14 @@ const SelectAll = () => {
             />
           </td>
           <td className={`display${program._id}`}>
-            <Link to={updateObj.solution_link} target="_blank">
-              <p className={`display${program._id}`}>
-                <ion-icon name="link-outline"></ion-icon>
-              </p>
+            <Link
+              to={program.solution_link}
+              className={`display${program._id}`}
+              target="_blank"
+            >
+              {/* <p className={`display${program._id}`}> */}
+              <ion-icon name="link-outline"></ion-icon>
+              {/* </p> */}
             </Link>
             <label style={{ display: "none" }} className={`edit${program._id}`}>
               <h5>Solution Link</h5>
@@ -250,6 +328,7 @@ const SelectAll = () => {
                       } else if (e.tagName === "TR") {
                         e.style.position = "relative";
                         e.style.left = "30%";
+                        // e.style.backgroundColor = "red"
                       } else if (e.tagName === "TD") {
                         e.style.display = "block";
                       }
@@ -267,6 +346,7 @@ const SelectAll = () => {
                       }
                     } catch (exce) {}
                   }
+
                   let htmlElement = document.getElementsByClassName(
                     `editSelect${program._id}`
                   )[0];
@@ -276,6 +356,10 @@ const SelectAll = () => {
                   htmlElement = document.getElementsByClassName(
                     `editSelect${program._id}`
                   )[0];
+                  let selectionBoxForTopic = document.getElementById(
+                    `selectionBoxForTopic${program._id}`
+                  );
+                  selectionBoxForTopic.style.display = "block";
                   htmlElement.style.display = "block";
                   setUpdateObj(program);
                 } else {
@@ -354,6 +438,13 @@ const SelectAll = () => {
                       `editSelect${program._id}`
                     )[0];
                     arr.style.display = "none";
+                    let selectionBoxForTopic = document.getElementById(
+                      `selectionBoxForTopic${program._id}`
+                    );
+                    document.getElementById(
+                      `textBoxForTopic${program._id}`
+                    ).style.display = "none";
+                    selectionBoxForTopic.style.display = "none";
                     document.getElementById(`editIcon${program._id}`).name =
                       "create-outline";
                   } catch (exce) {}

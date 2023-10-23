@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 
 const SelectAll = () => {
@@ -87,7 +89,7 @@ const SelectAll = () => {
       });
   };
 
-  const selectionList = topicObj.map((topic) => {
+  const allTopicsName = topicObj.map((topic) => {
     return (
       <>
         <option value={topic} style={{ textTransform: "capitalize" }}>
@@ -96,6 +98,168 @@ const SelectAll = () => {
       </>
     );
   });
+
+  const enableEditing = (programObj) => {
+    let trTags = document.getElementsByTagName(`tr`);
+    for (let tagKey in trTags) {
+      let tagValue = trTags[tagKey];
+      try {
+        if (
+          tagKey !== "length" &&
+          !tagValue.classList.contains(`display${programObj._id}`)
+        )
+          tagValue.style.filter = "blur(5px)";
+      } catch (exce) {}
+    }
+
+    let displayTags = document.getElementsByClassName(
+      `display${programObj._id}`
+    );
+    for (let tagKey in displayTags) {
+      let tagValue = displayTags[tagKey];
+      try {
+        if (tagValue.tagName !== "TD" && tagValue.tagName !== "TR") {
+          tagValue.style.display = "none";
+        } else if (tagValue.tagName === "TR") {
+          tagValue.style.position = "relative";
+          tagValue.style.left = "30%";
+        } else if (tagValue.tagName === "TD") {
+          tagValue.style.display = "block";
+        }
+      } catch (exce) {}
+    }
+
+    let editTags = document.getElementsByClassName(`edit${programObj._id}`);
+    for (let tagKey in editTags) {
+      let tagValue = editTags[tagKey];
+      try {
+        if (tagKey !== "length") {
+          tagValue.type = "text";
+          tagValue.style.display = "block";
+        }
+      } catch (exce) {}
+    }
+
+    let dropdownForDifficulty = document.getElementsByClassName(
+      `editSelect${programObj._id}`
+    )[0];
+    dropdownForDifficulty.style.display = "block";
+
+    let updateIcon = document.getElementById(`editIcon${programObj._id}`);
+    updateIcon.name = "checkmark-outline";
+
+    let selectionBoxForTopic = document.getElementById(
+      `selectionBoxForTopic${programObj._id}`
+    );
+    selectionBoxForTopic.style.display = "block";
+    // htmlElement.style.display = "block";
+    let cancelBtnForUpdate = document.getElementById(
+      `cancelBtnForUpdate${programObj._id}`
+    );
+    cancelBtnForUpdate.style.display = "block";
+  };
+
+  const disableEditing = (programObj, updatedDataObj) => {
+    let trTags = document.getElementsByTagName(`tr`);
+    for (let tagKey in trTags) {
+      let tagValue = trTags[tagKey];
+      try {
+        if (
+          tagKey !== "length" &&
+          !tagValue.classList.contains(`display${programObj._id}`)
+        )
+          tagValue.style.filter = "blur(0px)";
+      } catch (exce) {}
+    }
+
+    let displayTags = document.getElementsByClassName(
+      `display${programObj._id}`
+    );
+    let valuesForTags = [];
+    for (let val in updatedDataObj) valuesForTags.push(updatedDataObj[val]);
+    let indexForValuesForTags = 1;
+    for (let tagKey in displayTags) {
+      let tagValue = displayTags[tagKey];
+      try {
+        if (tagValue.tagName === "TR") {
+          tagValue.style.position = "revert";
+          continue;
+        }
+        tagValue.style.display = "revert";
+        if (indexForValuesForTags === 2 || indexForValuesForTags === 3)
+          continue;
+        if (tagValue.tagName !== "TD")
+          tagValue.innerText = valuesForTags[indexForValuesForTags++];
+      } catch (exce) {}
+    }
+
+    let editTags = document.getElementsByClassName(`edit${programObj._id}`);
+    for (let tagKey in editTags) {
+      let tagValue = editTags[tagKey];
+      try {
+        if (tagKey !== "length") {
+          tagValue.style.display = "none";
+          tagValue.type = "hidden";
+        }
+      } catch (exce) {}
+    }
+
+    try {
+      let dropdownForDifficulty = document.getElementsByClassName(
+        `editSelect${programObj._id}`
+      )[0];
+      dropdownForDifficulty.style.display = "none";
+
+      let selectionBoxForTopic = document.getElementById(
+        `selectionBoxForTopic${programObj._id}`
+      );
+      selectionBoxForTopic.style.display = "none";
+
+      let textBoxForTopic = document.getElementById(
+        `textBoxForTopic${programObj._id}`
+      );
+      textBoxForTopic.style.display = "none";
+
+      let updateIcon = document.getElementById(`editIcon${programObj._id}`);
+      updateIcon.name = "create-outline";
+
+      let cancelBtnForUpdate = document.getElementById(
+        `cancelBtnForUpdate${programObj._id}`
+      );
+      cancelBtnForUpdate.style.display = "none";
+    } catch (exce) {}
+  };
+
+  const updateData = (updatedDataObj) => {
+    fetch(`http://localhost:8000/programs/${updatedDataObj._id}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(updatedDataObj),
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        setUpdateObj({});
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Data Updated Successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+      .catch((e) => {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Some Error Occured!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+  };
 
   // const
   const allPrograms = filterArr.map((program) => {
@@ -108,15 +272,34 @@ const SelectAll = () => {
               onChange={(e) => {
                 if (e.target.checked === true) {
                   if (isAnyChecked === false) {
+                    toast.success(
+                      `Delete Button Activated! Now you can delete`,
+                      {
+                        position: toast.POSITION.TOP_CENTER,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        autoClose: 5000,
+                        theme: "light",
+                      }
+                    );
+                    toast.info(<DeleteButtonToast />, {
+                      position: toast.POSITION.TOP_CENTER,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      autoClose: false,
+                      theme: "light",
+                    });
                     setIsAnyChecked(true);
                   }
-                  // console.warn("selected" + program._id);
                   deleteArr.push({
                     id: program._id,
                     topic: program.program_topic,
                   });
                   setDeleteArr(deleteArr);
-                  // console.warn(deleteArr);
                 } else {
                   let index = 0;
                   deleteArr.forEach((element, ind) => {
@@ -127,14 +310,14 @@ const SelectAll = () => {
                       index = ind;
                     }
                   });
-                  console.warn(index);
                   if (index !== 0) deleteArr.splice(index, index);
                   else deleteArr.shift();
                   setDeleteArr(deleteArr);
-                  // console.warn(deleteArr);
                 }
-                if (isAnyChecked === true && deleteArr.length === 0)
+                if (isAnyChecked === true && deleteArr.length === 0) {
+                  toast.dismiss();
                   setIsAnyChecked(false);
+                }
               }}
             />
           </td>
@@ -149,7 +332,6 @@ const SelectAll = () => {
               <h5>Program Name</h5>
             </label>
             <input
-              // style={{ display: "none" }}
               type="hidden"
               className={`edit${program._id} form-control border-3`}
               value={updateObj.program_name}
@@ -173,24 +355,14 @@ const SelectAll = () => {
               }}
             >
               <option>Select Topic Name</option>
-              {selectionList}
+              {allTopicsName}
             </select>
-            {/* <input
-              // style={{ display: "none" }}
-              type="hidden"
-              className={`edit${program._id} form-control border-3`}
-              value={updateObj.program_topic}
-              onChange={(e) => {
-                // program.program_topic = e.target.value;
-                setUpdateObj({ ...updateObj, program_topic: e.target.value });
-              }}
-            /> */}
             <input
               required
               type="text"
               class={`form-control`}
               id={`textBoxForTopic${program._id}`}
-              style={{ display: "none"}}
+              style={{ display: "none" }}
               placeholder="Program Topic"
               value={updateObj.program_topic}
               onChange={(e) => {
@@ -199,14 +371,15 @@ const SelectAll = () => {
             />
             <input
               type="button"
-              style={{ display: "none" , width: "500px"}}
+              style={{ display: "none", width: "500px" }}
               className={`btn btn-outline-primary my-3 edit${program._id}`}
               value={listOrTextAreaBtn}
               onClick={(e) => {
                 try {
                   if (
-                    document.getElementById(`selectionBoxForTopic${program._id}`).style
-                      .display === "none"
+                    document.getElementById(
+                      `selectionBoxForTopic${program._id}`
+                    ).style.display === "none"
                   ) {
                     document.getElementById(
                       `selectionBoxForTopic${program._id}`
@@ -236,15 +409,12 @@ const SelectAll = () => {
               className={`display${program._id}`}
               target="_blank"
             >
-              {/* <p > */}
               <ion-icon name="link-outline"></ion-icon>
-              {/* </p> */}
             </Link>
             <label style={{ display: "none" }} className={`edit${program._id}`}>
               <h5>Problem Link</h5>
             </label>
             <input
-              // style={{ display: "none" }}
               type="hidden"
               className={`edit${program._id} form-control border-3`}
               value={updateObj.program_link}
@@ -259,15 +429,12 @@ const SelectAll = () => {
               className={`display${program._id}`}
               target="_blank"
             >
-              {/* <p className={`display${program._id}`}> */}
               <ion-icon name="link-outline"></ion-icon>
-              {/* </p> */}
             </Link>
             <label style={{ display: "none" }} className={`edit${program._id}`}>
               <h5>Solution Link</h5>
             </label>
             <input
-              // style={{ display: "none" }}
               type="hidden"
               className={`edit${program._id} form-control border-3`}
               value={updateObj.solution_link}
@@ -303,203 +470,56 @@ const SelectAll = () => {
                   document.getElementById(`editIcon${program._id}`).name ===
                   "create-outline"
                 ) {
-                  let arr = document.getElementsByTagName(`tr`);
-
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      if (
-                        k !== "length" &&
-                        !e.classList.contains(`display${program._id}`)
-                      )
-                        e.style.filter = "blur(5px)";
-                    } catch (exce) {}
-                  }
-
-                  arr = document.getElementsByClassName(
-                    `display${program._id}`
-                  );
-
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      if (e.tagName !== "TD" && e.tagName !== "TR") {
-                        e.style.display = "none";
-                      } else if (e.tagName === "TR") {
-                        e.style.position = "relative";
-                        e.style.left = "30%";
-                        // e.style.backgroundColor = "red"
-                      } else if (e.tagName === "TD") {
-                        e.style.display = "block";
-                      }
-                    } catch (exce) {}
-                  }
-                  arr = document.getElementsByClassName(`edit${program._id}`);
-
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      // } catch (exce) {
-                      if (k !== "length") {
-                        e.type = "text";
-                        e.style.display = "block";
-                      }
-                    } catch (exce) {}
-                  }
-
-                  let htmlElement = document.getElementsByClassName(
-                    `editSelect${program._id}`
-                  )[0];
-                  htmlElement.style.display = "block";
-                  document.getElementById(`editIcon${program._id}`).name =
-                    "checkmark-outline";
-                  htmlElement = document.getElementsByClassName(
-                    `editSelect${program._id}`
-                  )[0];
-                  let selectionBoxForTopic = document.getElementById(
-                    `selectionBoxForTopic${program._id}`
-                  );
-                  selectionBoxForTopic.style.display = "block";
-                  htmlElement.style.display = "block";
+                  enableEditing(program);
                   setUpdateObj(program);
                 } else {
-                  fetch(`http://localhost:8000/programs/${updateObj._id}`, {
-                    method: "PUT",
-                    headers: {
-                      Accept: "application/json",
-                      "Content-type": "application/json",
-                    },
-                    body: JSON.stringify(updateObj),
-                  })
-                    .then((r) => r.json())
-                    .then((res) => {
-                      setUpdateObj({});
-                      Swal.fire({
-                        position: "top-end",
-                        icon: "success",
-                        title: "Data Updated Successfully!",
-                        showConfirmButton: false,
-                        timer: 1500,
-                      });
-                    })
-                    .catch((e) => {
-                      Swal.fire({
-                        position: "top-end",
-                        icon: "error",
-                        title: "Some Error Occured!",
-                        showConfirmButton: false,
-                        timer: 1500,
-                      });
-                    });
-                  let arr = document.getElementsByTagName(`tr`);
-
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      if (
-                        k !== "length" &&
-                        !e.classList.contains(`display${program._id}`)
-                      )
-                        e.style.filter = "blur(0px)";
-                    } catch (exce) {}
-                  }
-
-                  arr = document.getElementsByClassName(
-                    `display${program._id}`
-                  );
-                  let values = [];
-                  for (let val in updateObj) values.push(updateObj[val]);
-                  let index = 1;
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      if (e.tagName === "TR") {
-                        e.style.position = "revert";
-                        continue;
-                      }
-                      e.style.display = "revert";
-                      if (index === 2 || index === 3) continue;
-                      if (e.tagName !== "TD") e.innerText = values[index++];
-                    } catch (exce) {}
-                  }
-                  arr = document.getElementsByClassName(`edit${program._id}`);
-
-                  for (let k in arr) {
-                    let e = arr[k];
-                    try {
-                      if (k !== "length") {
-                        e.style.display = "none";
-                        e.type = "hidden";
-                      }
-                    } catch (exce) {}
-                  }
-                  try {
-                    arr = document.getElementsByClassName(
-                      `editSelect${program._id}`
-                    )[0];
-                    arr.style.display = "none";
-                    let selectionBoxForTopic = document.getElementById(
-                      `selectionBoxForTopic${program._id}`
-                    );
-                    document.getElementById(
-                      `textBoxForTopic${program._id}`
-                    ).style.display = "none";
-                    selectionBoxForTopic.style.display = "none";
-                    document.getElementById(`editIcon${program._id}`).name =
-                      "create-outline";
-                  } catch (exce) {}
+                  disableEditing(program, updateObj);
+                  updateData(updateObj);
                 }
               }}
             >
-              {/* <Link
-                to={"./UpdateByID/" + program._id + "/" + program.program_topic}
-                className="text-decoration-none"
-              > */}
               <ion-icon
                 id={`editIcon${program._id}`}
                 name="create-outline"
               ></ion-icon>
-              {/* </Link> */}
             </button>
           </td>
           <td>
-            {/* <button
-              type="submit"
+            <button
               className="btn btn-outline-danger"
-              onClick={(e) => {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "It will deleted permanently!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    Delete(program._id, program.program_topic);
-                  }
-                });
+              id={`cancelBtnForUpdate${program._id}`}
+              style={{ display: "none" }}
+              onClick={() => {
+                disableEditing(program, updateObj);
               }}
             >
-              <ion-icon name="trash-outline"></ion-icon>
-            </button> */}
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
           </td>
         </tr>
       </>
     );
   });
 
-  const allTopicsName = topicObj.map((topic) => {
+  const DeleteButtonToast = ({ closeToast }) => {
     return (
-      <>
-        <option>{topic}</option>
-      </>
+      <div>
+        <button
+          className="btn btn-outline-danger"
+          onClick={() => {
+            deleteFromArray();
+            closeToast();
+          }}
+        >
+          Delete <ion-icon name="trash-outline"></ion-icon>
+        </button>
+      </div>
     );
-  });
+  };
 
   return (
     <div className="selectAll main">
+      <ToastContainer />
       <div className="d-flex justify-content-between flex-wrap">
         <div>
           <h1>Programs</h1>
@@ -578,23 +598,6 @@ const SelectAll = () => {
           </select>
         </div>
         <div>
-          {!isAnyChecked ? (
-            <button
-              className="btn btn-outline-danger"
-              style={{ display: "none" }}
-            >
-              <ion-icon name="trash-outline"></ion-icon>
-            </button>
-          ) : (
-            <button
-              className="btn btn-outline-danger"
-              onClick={() => {
-                deleteFromArray();
-              }}
-            >
-              <ion-icon name="trash-outline"></ion-icon>
-            </button>
-          )}
           <Link className="successAddBtn btn rounded-3 m-2" to={"../Insert"}>
             <ion-icon name="add-outline"></ion-icon>
           </Link>

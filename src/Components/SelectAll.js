@@ -68,13 +68,11 @@ const SelectAll = () => {
       .then((resp) => {
         navigate("../");
         setTimeout(() => {
-          Swal.fire({
-            position: "top-end",
-            icon: "success",
-            title: "Data Deleted Successfully!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          Swal.fire(
+            'Deleted!',
+            'Your data has been deleted.',
+            'success'
+          )
           navigate("../SelectAll");
         }, 0.01);
       })
@@ -316,6 +314,18 @@ const SelectAll = () => {
                 }
                 if (isAnyChecked === true && deleteArr.length === 0) {
                   toast.dismiss();
+                  toast.error(
+                    `Delete Button Deactivated! You can't delete`,
+                    {
+                      position: toast.POSITION.TOP_CENTER,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      autoClose: 5000,
+                      theme: "light",
+                    }
+                  )
                   setIsAnyChecked(false);
                 }
               }}
@@ -507,7 +517,19 @@ const SelectAll = () => {
         <button
           className="btn btn-outline-danger"
           onClick={() => {
-            deleteFromArray();
+            Swal.fire({
+              title: 'Are you sure?',
+              text: `You want to delete ${deleteArr.length} records ?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                deleteFromArray();
+              }
+            })
             closeToast();
           }}
         >

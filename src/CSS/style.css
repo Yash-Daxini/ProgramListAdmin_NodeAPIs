@@ -18,6 +18,9 @@ html {
 table tr,table td{
     transition: 0.8s;
 }
+.main .custom-toast-container{
+    z-index: 9999 !important;
+}
 /* input,label{ */
     /* transition: 2s; */
 /* } */
@@ -274,7 +277,7 @@ form input{
     min-height: 100vh;
     left: 100px;
     background-color: #f5f5f5;
-    z-index: -1;
+    /* z-index: -1; */
     transition: 0.5s;
     overflow-x: scroll;
 }
@@ -300,7 +303,7 @@ form input{
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index: 10000;
+    z-index: 9998;
     color: white;
  }
 .main .topbar .toggle::before{
@@ -572,7 +575,7 @@ table {
         display:flex;
         justify-content:center;
         align-items:center;
-        z-index: 10000;
+        z-index: 9998;
         color: white;
      }
     .navigation .toggleInSideBar::before{

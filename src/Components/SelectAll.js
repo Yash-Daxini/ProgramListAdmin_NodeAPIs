@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const SelectAll = () => {
   const navigate = useNavigate();
   const [programObj, setProgramObj] = useState([]);
+  const [newProgram, setNewProgram] = useState({});
   const [listOrTextAreaBtn, setListOrTextAreaBtn] = useState(
     "Not Present in list ? Want to add new topic !"
   );
@@ -34,7 +35,7 @@ const SelectAll = () => {
         setFilterArr(data);
       })
       .catch((e) => {});
-  }, [updateObj]);
+  }, [updateObj, newProgram]);
 
   let setForTopic = new Set();
 
@@ -613,9 +614,20 @@ const SelectAll = () => {
           </select>
         </div>
         <div>
-          <Link className="successAddBtn btn rounded-3 m-2" to={"../Insert"}>
+          <button className="btn btn-outline-success rounded-3 m-2" onClick={()=>{
+            let forms = document.getElementsByClassName("addForm");
+            try{
+              for (let form in forms) {
+                let formElement = forms[form];
+                formElement.style.display = "revert";
+              }
+            }
+            catch(exce){
+
+            }
+          }}>
             <ion-icon name="add-outline"></ion-icon>
-          </Link>
+          </button>
         </div>
       </div>
       <div className="table-responsive">
@@ -642,7 +654,163 @@ const SelectAll = () => {
               </tr>
             </tbody>
           ) : (
-            <tbody className="text-center">{allPrograms}</tbody>
+            <tbody className="text-center">
+              <tr className="addForm" style={{ display: "none" }}>
+                <td></td>
+                <td>
+                  <input
+                    type="text"
+                    className={`add form-control border-3`}
+                    value={newProgram.program_name}
+                    onChange={(e) => {
+                      setNewProgram({
+                        ...newProgram,
+                        program_name: e.target.value,
+                      });
+                    }}
+                  />
+                </td>
+                <td>
+                  <select
+                    className={`form-control add`}
+                    id={`topicDropdownForAdd`}
+                    value={newProgram.program_topic}
+                    onChange={(e) => {
+                      setUpdateObj({
+                        ...newProgram,
+                        program_topic: e.target.value,
+                      });
+                    }}
+                  >
+                    <option>Select Topic Name</option>
+                    {allTopicsName}
+                  </select>
+                  <input
+                    required
+                    type="text"
+                    class={`form-control`}
+                    id={`topicTextBoxForAdd`}
+                    style={{ display: "none" }}
+                    placeholder="Program Topic"
+                    value={newProgram.program_topic}
+                    onChange={(e) => {
+                      setUpdateObj({
+                        ...newProgram,
+                        program_topic: e.target.value,
+                      });
+                    }}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className={`add form-control border-3`}
+                    value={newProgram.program_link}
+                    onChange={(e) => {
+                      setNewProgram({
+                        ...newProgram,
+                        program_link: e.target.value,
+                      });
+                    }}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className={`add form-control border-3`}
+                    value={newProgram.solution_link}
+                    onChange={(e) => {
+                      setNewProgram({
+                        ...newProgram,
+                        solution_link: e.target.value,
+                      });
+                    }}
+                  />
+                </td>
+                <td colSpan={2}>
+                  <select
+                    class={`form-control add border-3`}
+                    value={newProgram.difficulty}
+                    onChange={(e) => {
+                      setNewProgram({
+                        ...newProgram,
+                        difficulty: e.target.value,
+                      });
+                    }}
+                  >
+                    <option>Select Difficulty</option>
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
+                  </select>
+                </td>
+                <td></td>
+              </tr>
+              <tr className="addForm" style={{ display: "none" }}>
+                <td colSpan={3}>
+                  <input
+                    type="button"
+                    style={{ width: "500px" }}
+                    className={`btn btn-outline-primary my-3 add`}
+                    value={listOrTextAreaBtn}
+                    onClick={(e) => {
+                      try {
+                        if (
+                          document.getElementById(`topicDropdownForAdd`).style
+                            .display === "none"
+                        ) {
+                          document.getElementById(
+                            `topicDropdownForAdd`
+                          ).style.display = "block";
+                          document.getElementById(
+                            `topicTextBoxForAdd`
+                          ).style.display = "none";
+                          setListOrTextAreaBtn(
+                            "Not Present in list ? Want to add new topic !"
+                          );
+                        } else {
+                          document.getElementById(
+                            `topicDropdownForAdd`
+                          ).style.display = "none";
+                          document.getElementById(
+                            `topicTextBoxForAdd`
+                          ).style.display = "block";
+                          setListOrTextAreaBtn("Want to select from list ? ");
+                        }
+                      } catch (exce) {}
+                    }}
+                  ></input>
+                </td>
+                <td colSpan={2}>
+                  <button
+                    className="btn btn-outline-success mx-3"
+                    onClick={() => {
+                      console.warn(newProgram);
+                    }}
+                  >
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                  </button>
+                  <button
+                    className="btn btn-outline-danger mx-5"
+                    onClick={() => {
+                      let forms = document.getElementsByClassName("addForm");
+                      try{
+                        for (let form in forms) {
+                          let formElement = forms[form];
+                          formElement.style.display = "none";
+                        }
+                      }
+                      catch(exce){
+
+                      }
+                    }}
+                  >
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
+                </td>
+              </tr>
+              {allPrograms}
+            </tbody>
           )}
         </table>
       </div>

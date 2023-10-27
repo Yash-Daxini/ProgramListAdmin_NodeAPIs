@@ -16,7 +16,7 @@ html {
     }
 }
 table tr,table td{
-    transition: 0.8s;
+    transition: 1s;
 }
 .main .custom-toast-container{
     z-index: 9999 !important;

@@ -19,6 +19,7 @@ const SelectAll = () => {
   const [deleteArr, setDeleteArr] = useState([]);
   const [updateObj, setUpdateObj] = useState({});
   const [filterArr, setFilterArr] = useState([]);
+  let isTopicPresent = true;
   useEffect(() => {
     if (sessionStorage.getItem("user") === null) {
       navigate("../login");
@@ -225,6 +226,101 @@ const SelectAll = () => {
     } catch (exce) {}
   };
 
+  const enableAdd = () => {
+    let forms = document.getElementsByClassName("addForm");
+    try {
+      let addBtn = document.getElementById("addBtn");
+      addBtn.style.display = "none";
+      for (let form in forms) {
+        let formElement = forms[form];
+        formElement.style.display = "revert";
+      }
+    } catch (exce) {}
+  };
+
+  const disableAdd = () => {
+    let forms = document.getElementsByClassName("addForm");
+    try {
+      let addBtn = document.getElementById("addBtn");
+      addBtn.style.display = "revert";
+      for (let form in forms) {
+        let formElement = forms[form];
+        formElement.style.display = "none";
+      }
+    } catch (exce) {}
+  };
+
+  const addData = (newProgram) => {
+    if (
+      newProgram.program_name === undefined ||
+      newProgram.program_topic === undefined ||
+      newProgram.program_topic === "Select Topic Name" ||
+      newProgram.program_topic === "" ||
+      newProgram.program_link === undefined ||
+      newProgram.solution_link === undefined ||
+      newProgram.difficulty === undefined ||
+      newProgram.difficulty === "Select Difficulty"
+    ) {
+      Swal.fire({
+        title: "Error!",
+        text: "All fields are not fullfilled",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+      return;
+    }
+    if (isTopicPresent) {
+      fetch("http://localhost:8000/topic", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          topic_name: newProgram.program_topic,
+        }),
+      }).then((res) => {
+        setNewProgram({});
+      });
+    }
+    fetch("http://localhost:8000/programs", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(newProgram),
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Data Inserted Successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+      .catch((e) => {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Some Error Occured!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+
+    setNewProgram({
+      ...newProgram,
+      program_name: "",
+      program_topic: "",
+      program_link: "",
+      solution_link: "",
+      difficulty: "",
+    });
+  };
+
   const updateData = (updatedDataObj) => {
     fetch(`http://localhost:8000/programs/${updatedDataObj._id}`, {
       method: "PUT",
@@ -256,7 +352,6 @@ const SelectAll = () => {
       });
   };
 
-  // const
   const allPrograms = filterArr.map((program) => {
     return (
       <>
@@ -614,18 +709,13 @@ const SelectAll = () => {
           </select>
         </div>
         <div>
-          <button className="btn btn-outline-success rounded-3 m-2" onClick={()=>{
-            let forms = document.getElementsByClassName("addForm");
-            try{
-              for (let form in forms) {
-                let formElement = forms[form];
-                formElement.style.display = "revert";
-              }
-            }
-            catch(exce){
-
-            }
-          }}>
+          <button
+            className="btn btn-outline-success rounded-3 m-2"
+            id="addBtn"
+            onClick={() => {
+              enableAdd();
+            }}
+          >
             <ion-icon name="add-outline"></ion-icon>
           </button>
         </div>
@@ -656,11 +746,10 @@ const SelectAll = () => {
           ) : (
             <tbody className="text-center">
               <tr className="addForm" style={{ display: "none" }}>
-                <td></td>
-                <td>
+                <td colSpan={2}>
                   <input
                     type="text"
-                    className={`add form-control border-3`}
+                    className={`add form-control border-3 w-75 mx-5`}
                     value={newProgram.program_name}
                     onChange={(e) => {
                       setNewProgram({
@@ -676,7 +765,7 @@ const SelectAll = () => {
                     id={`topicDropdownForAdd`}
                     value={newProgram.program_topic}
                     onChange={(e) => {
-                      setUpdateObj({
+                      setNewProgram({
                         ...newProgram,
                         program_topic: e.target.value,
                       });
@@ -694,7 +783,7 @@ const SelectAll = () => {
                     placeholder="Program Topic"
                     value={newProgram.program_topic}
                     onChange={(e) => {
-                      setUpdateObj({
+                      setNewProgram({
                         ...newProgram,
                         program_topic: e.target.value,
                       });
@@ -744,7 +833,6 @@ const SelectAll = () => {
                     <option>Hard</option>
                   </select>
                 </td>
-                <td></td>
               </tr>
               <tr className="addForm" style={{ display: "none" }}>
                 <td colSpan={3}>
@@ -768,6 +856,7 @@ const SelectAll = () => {
                           setListOrTextAreaBtn(
                             "Not Present in list ? Want to add new topic !"
                           );
+                          isTopicPresent = true;
                         } else {
                           document.getElementById(
                             `topicDropdownForAdd`
@@ -776,6 +865,7 @@ const SelectAll = () => {
                             `topicTextBoxForAdd`
                           ).style.display = "block";
                           setListOrTextAreaBtn("Want to select from list ? ");
+                          isTopicPresent = false;
                         }
                       } catch (exce) {}
                     }}
@@ -785,7 +875,8 @@ const SelectAll = () => {
                   <button
                     className="btn btn-outline-success mx-3"
                     onClick={() => {
-                      console.warn(newProgram);
+                      addData(newProgram);
+                      disableAdd();
                     }}
                   >
                     <ion-icon name="checkmark-outline"></ion-icon>
@@ -793,16 +884,7 @@ const SelectAll = () => {
                   <button
                     className="btn btn-outline-danger mx-5"
                     onClick={() => {
-                      let forms = document.getElementsByClassName("addForm");
-                      try{
-                        for (let form in forms) {
-                          let formElement = forms[form];
-                          formElement.style.display = "none";
-                        }
-                      }
-                      catch(exce){
-
-                      }
+                      disableAdd();
                     }}
                   >
                     <ion-icon name="close-outline"></ion-icon>

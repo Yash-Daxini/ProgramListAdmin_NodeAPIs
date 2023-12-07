@@ -24,7 +24,20 @@ const SelectByID = () => {
       })
       .catch((e) => {});
   }, [params.id]);
+    let testCasesArray = programObj.testcases !== undefined ? JSON.parse(programObj.testcases) : [];
+    let allTestCases = [];
+    for(var i = 0; i <= Object.keys(testCasesArray).length - 1 ; i++){
+      allTestCases.push(testCasesArray[i])
+    }
 
+    let ansArr = [];
+    for( let obj in allTestCases ){
+      let ele = allTestCases[obj];
+      for(let e in ele){
+        ansArr.push(<h5> <b>{e}</b> = {ele[e]} </h5>);
+      }
+    }
+  
   return (
     <div className="align-items-center my-5">
       <h1 className="my-5">{programObj.program_name}</h1>
@@ -54,6 +67,14 @@ const SelectByID = () => {
               <span className="fs-6">{programObj.difficulty}</span>
             </h4>
           )}
+      </div>
+      <div className="problemDescription">
+        <h5>Description :- </h5>
+        <p>{programObj.description}</p>
+      </div>
+      <div className="problemDescription">
+        <h5>Testcaes :- </h5>
+        {ansArr}
       </div>
       <div className="my-5 d-flex justify-content-center align-items-center">
         <button className="btn btn-outline-primary mx-5">
